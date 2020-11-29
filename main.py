@@ -3,9 +3,11 @@ from time import strftime
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import os
+import sys
 from PIL import ImageTk, Image
 
 cdir = os.getcwd()
+platform = sys.platform
 
 res_width = 1310
 res_height = 704
@@ -88,7 +90,9 @@ class PageTwo(tk.Frame):
 
 app = Application()
 app.title("Crypto App")
-# app.wm_attributes("-zoomed", 1)
-app.state("zoomed")
+if platform == "linux":
+    app.wm_attributes("-zoomed", 1)
+else:
+    app.state("zoomed")
 app.configure(bg="black")
 app.mainloop()
