@@ -88,6 +88,7 @@ class PageTwo(tk.Frame):
 
 app = Application()
 app.title("Crypto App")
-app.wm_attributes("-zoomed", 1)
+# app.wm_attributes("-zoomed", 1)
+app.state("zoomed")
 app.configure(bg="black")
 app.mainloop()
