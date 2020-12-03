@@ -5,7 +5,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import os
 import sys
 from PIL import ImageTk, Image
-import binance_wrapper as binance
+from binance_wrapper import get_klines
 
 # current directory and platform (either linux or win32)
 cdir = os.getcwd()
