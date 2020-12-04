@@ -11,7 +11,7 @@ from binance_wrapper import get_klines
 cdir = os.getcwd()
 platform = sys.platform
 
-# temporary variable
+# variable updates on load
 res_width = 1310
 res_height = 704
 
@@ -33,11 +33,11 @@ class Application(tk.Tk):
         self.frames = {}
 
         # cycle through windows
-        for F in (MainMenu, PageTwo):
+        for F in (Startup, MainMenu, PageTwo):
             frame = F(container, self)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
-        self.show_frame(MainMenu)
+        self.show_frame(Startup)
 
     # method to change frames
     def show_frame(self, cont):
@@ -45,10 +45,29 @@ class Application(tk.Tk):
         frame.tkraise()
 
 
-class MainMenu(tk.Frame):  # main menu
+class Startup(tk.Frame):  # second page
     def __init__(self, parent, app):
         tk.Frame.__init__(self, parent)
 
+        def load_main():
+            global res_width
+            res_width = self.winfo_width()
+            global res_height
+            res_height = self.winfo_height()
+
+            MainMenu.load_page(app.frames[MainMenu])
+            app.show_frame(MainMenu)
+
+        tk.Label(self, text="Loading", font=("Consolas", 120)).pack()
+        tk.Button(self, text="Press to continue", command=lambda: load_main()).pack()
+
+
+class MainMenu(tk.Frame):  # main menu
+    def __init__(self, parent, app):
+        tk.Frame.__init__(self, parent)
+        self.cog_image = None
+
+    def load_page(self):
         # blank canvas for drawing shapes
         canvas = tk.Canvas(self, width=res_width, height=res_height, bg="#15151c", highlightbackground="#15151c")
         canvas.pack()
@@ -75,7 +94,7 @@ class MainMenu(tk.Frame):  # main menu
         FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.1 + (0.8 / 3), rely=0.75)
 
         # search bar
-        search = tk.Entry(font=("Consolas", round(res_height / 28)), bg="#15151c", fg="#3ac7c2",
+        search = tk.Entry(self, font=("Consolas", round(res_height / 28)), bg="#15151c", fg="#3ac7c2",
                           highlightbackground="#67676b")
         search.insert(0, " Search")
         search.place(relx=0.35, rely=0.06, width=0.3 * res_width, height=0.1 * res_height)
@@ -94,7 +113,7 @@ class MainMenu(tk.Frame):  # main menu
         # settings button
         self.cog_image = ImageTk.PhotoImage(Image.open("images/cog.png")
                                             .resize((rel_width(0.08), rel_height(0.14)), Image.ANTIALIAS))
-        settings = tk.Button(image=self.cog_image, text="test", bg="#15151c", highlightthickness=0, bd=0,
+        settings = tk.Button(self, image=self.cog_image, text="test", bg="#15151c", highlightthickness=0, bd=0,
                              activebackground="#15151c", command=lambda: app.show_frame(PageTwo))
         settings.place(relx=0.05, rely=0.05, width=rel_width(0.08), height=rel_height(0.14))
 
