@@ -49,6 +49,8 @@ class Startup(tk.Frame):  # second page
     def __init__(self, parent, app):
         tk.Frame.__init__(self, parent)
 
+        self.configure(bg="#15151c")
+
         def load_main():
             global res_width
             res_width = self.winfo_width()
@@ -58,8 +60,9 @@ class Startup(tk.Frame):  # second page
             MainMenu.load_page(app.frames[MainMenu])
             app.show_frame(MainMenu)
 
-        tk.Label(self, text="Loading", font=("Consolas", 120)).pack()
-        tk.Button(self, text="Press to continue", command=lambda: load_main()).pack()
+        tk.Label(self, text="Loading", font=("Consolas", 120), bg="#15151c", fg="#3ac7c2").pack()
+        tk.Button(self, text="Press to continue", font=("Consolas", 40), bg="#15151c", fg="#67676b",
+                  command=lambda: load_main()).pack()
 
 
 class MainMenu(tk.Frame):  # main menu
