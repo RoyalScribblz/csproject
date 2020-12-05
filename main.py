@@ -58,6 +58,7 @@ class Startup(tk.Frame):  # second page
             res_height = self.winfo_height()
 
             MainMenu.load_page(app.frames[MainMenu])
+            self.update_idletasks()  # make page transition less choppy
             app.show_frame(MainMenu)
 
         tk.Label(self, text="Loading", font=("Consolas", 120), bg="#15151c", fg="#3ac7c2").pack()
@@ -125,6 +126,7 @@ class PageTwo(tk.Frame):  # second page
     def __init__(self, parent, app):
         tk.Frame.__init__(self, parent)
         tk.Label(self, text="pg2", font=("Consolas", 40)).pack()
+        tk.Button(self, text="Return", command=lambda: app.show_frame(MainMenu)).pack()
 
 
 # launch application
