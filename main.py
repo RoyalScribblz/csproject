@@ -5,7 +5,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import os
 import sys
 from PIL import ImageTk, Image
-from binance_wrapper import get_klines
+# from binance_wrapper import get_klines
 
 # current directory and platform (either linux or win32)
 cdir = os.getcwd()
@@ -34,7 +34,7 @@ class Application(tk.Tk):
 
         # cycle through windows
         for F in (Startup, MainMenu, PageTwo):
-            frame = F(container, self)
+            frame = F(container)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
         self.show_frame(Startup)
@@ -46,7 +46,7 @@ class Application(tk.Tk):
 
 
 class Startup(tk.Frame):  # second page
-    def __init__(self, parent, app):
+    def __init__(self, parent):
         tk.Frame.__init__(self, parent)
 
         self.configure(bg="#15151c")
@@ -67,9 +67,10 @@ class Startup(tk.Frame):  # second page
 
 
 class MainMenu(tk.Frame):  # main menu
-    def __init__(self, parent, app):
+    def __init__(self, parent):
         tk.Frame.__init__(self, parent)
         self.cog_image = None
+        self.configure(bg="#15151c")
 
     def load_page(self):
         # blank canvas for drawing shapes
@@ -123,9 +124,10 @@ class MainMenu(tk.Frame):  # main menu
 
 
 class PageTwo(tk.Frame):  # second page
-    def __init__(self, parent, app):
+    def __init__(self, parent):
         tk.Frame.__init__(self, parent)
-        tk.Label(self, text="pg2", font=("Consolas", 40)).pack()
+        self.configure(bg="#15151c")
+        tk.Label(self, text="pg2", font=("Consolas", 40), fg="#67676b", bg="#15151c").pack()
         tk.Button(self, text="Return", command=lambda: app.show_frame(MainMenu)).pack()
 
 
