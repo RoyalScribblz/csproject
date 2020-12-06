@@ -5,7 +5,9 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import os
 import sys
 from PIL import ImageTk, Image
-# from binance_wrapper import get_klines
+import pandas as pd
+from binance_wrapper import get_klines
+from datetime import datetime
 
 # current directory and platform (either linux or win32)
 cdir = os.getcwd()
@@ -88,9 +90,16 @@ class MainMenu(tk.Frame):  # main menu
 
         tick()
 
+        df = pd.DataFrame(get_klines("BTCUSDT", "1m"), columns=["Open time", "Open", "High", "Low", "Close", "Volume",
+                                                                "Close time", "Quote asset volume", "Number of trades",
+                                                                "Taker buy base asset volume",
+                                                                "Taker buy quote asset volume", "Ignore."])
+
         # graphs
         figure = plt.Figure(figsize=((0.8 / 3) * res_width / 100, 0.2 * res_height / 100), facecolor="#67676b")
-        figure.add_subplot(111, fc="#15151c").plot([1, 2, 3, 4], [1, 5, 7, 6], ".-g")
+        print(df["Close time"][0:50].tolist())
+        print(df["Close"][0:50].tolist())
+        figure.add_subplot(fc="#15151c").plot(df["Close time"], df["Close"], "-g")
         FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.05, rely=0.25)
         FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.05, rely=0.5)
         FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.05, rely=0.75)
