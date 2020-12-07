@@ -99,7 +99,7 @@ class MainMenu(tk.Frame):  # main menu
         figure = plt.Figure(figsize=((0.8 / 3) * res_width / 100, 0.2 * res_height / 100), facecolor="#67676b")
         print(df["Close time"][0:50].tolist())
         print(df["Close"][0:50].tolist())
-        figure.add_subplot(fc="#15151c").plot(df["Close time"], df["Close"], "-g")
+        figure.add_subplot(fc="#15151c").plot(df["Close time"][0:50], df["Close"][0:50], "-g")
         FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.05, rely=0.25)
         FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.05, rely=0.5)
         FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.05, rely=0.75)
