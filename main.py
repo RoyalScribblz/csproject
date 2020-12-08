@@ -7,7 +7,6 @@ import sys
 from PIL import ImageTk, Image
 import pandas as pd
 from binance_wrapper import get_klines
-from datetime import datetime
 
 # current directory and platform (either linux or win32)
 cdir = os.getcwd()
@@ -90,22 +89,23 @@ class MainMenu(tk.Frame):  # main menu
 
         tick()
 
-        df = pd.DataFrame(get_klines("BTCUSDT", "1m"), columns=["Open time", "Open", "High", "Low", "Close", "Volume",
-                                                                "Close time", "Quote asset volume", "Number of trades",
-                                                                "Taker buy base asset volume",
-                                                                "Taker buy quote asset volume", "Ignore."])
-
         # graphs
-        figure = plt.Figure(figsize=((0.8 / 3) * res_width / 100, 0.2 * res_height / 100), facecolor="#67676b")
-        print(df["Close time"][0:50].tolist())
-        print(df["Close"][0:50].tolist())
-        figure.add_subplot(fc="#15151c").plot(df["Close time"][0:50], df["Close"][0:50], "-g")
-        FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.05, rely=0.25)
-        FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.05, rely=0.5)
-        FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.05, rely=0.75)
-        FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.1 + (0.8 / 3), rely=0.25)
-        FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.1 + (0.8 / 3), rely=0.5)
-        FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.1 + (0.8 / 3), rely=0.75)
+        graph_coins = ["BTC", "ETH", "XRP", "LTC", "LINK", "ADA"]
+        graphs_x = [0.05, 0.05, 0.05, 0.1 + (0.8 / 3), 0.1 + (0.8 / 3), 0.1 + (0.8 / 3)]
+        graphs_y = [0.25, 0.5, 0.75, 0.25, 0.5, 0.75]
+        for index in range(6):
+            df = pd.DataFrame(get_klines(graph_coins[index] + "USDT", "1m"),
+                              columns=["Open time", "Open", "High", "Low", "Close", "Volume",
+                                       "Close time", "Quote asset volume", "Number of trades",
+                                       "Taker buy base asset volume",
+                                       "Taker buy quote asset volume", "Ignore."])
+            figure = plt.Figure(figsize=((0.8 / 3) * res_width / 100, 0.2 * res_height / 100), facecolor="#67676b")
+            if df["Close"][499] > df["Close"][0]:
+                colour = "g"
+            else:
+                colour = "r"
+            figure.add_subplot(fc="#15151c").plot(df["Close time"], df["Close"].astype(float), "-" + colour)
+            FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=graphs_x[index], rely=graphs_y[index])
 
         # search bar
         search = tk.Entry(self, font=("Consolas", round(res_height / 28)), bg="#15151c", fg="#3ac7c2",
