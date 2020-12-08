@@ -121,7 +121,7 @@ class MainMenu(tk.Frame):  # main menu
                            round((0.15 + ((0.8 / 3) * 3)) * res_width), round(0.35 * res_height),
                            width=5, fill="#67676b")
         gains_font = ("Consolas", round(res_height / 25))
-        top_gains = tk.Label(self, text="Top Gains", font=gains_font, bg="#15151c", fg="#3ac7c2")
+        top_gains = tk.Label(self, text="(%) Change", font=gains_font, bg="#15151c", fg="#3ac7c2")
         top_gains.place(relx=(0.17 + ((0.8 / 3) * 2)), rely=0.27)
 
         # settings button
