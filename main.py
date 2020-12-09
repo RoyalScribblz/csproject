@@ -93,6 +93,7 @@ class MainMenu(tk.Frame):  # main menu
         graph_coins = ["BTC", "ETH", "XRP", "LTC", "LINK", "ADA"]
         graphs_x = [0.05, 0.05, 0.05, 0.1 + (0.8 / 3), 0.1 + (0.8 / 3), 0.1 + (0.8 / 3)]
         graphs_y = [0.25, 0.5, 0.75, 0.25, 0.5, 0.75]
+        percentage_change = [["BTC"], ["ETH"], ["XRP"], ["LTC"], ["LINK"], ["ADA"]]
         for index in range(6):
             df = pd.DataFrame(get_klines(graph_coins[index] + "USDT", "1m"),
                               columns=["Open time", "Open", "High", "Low", "Close", "Volume",
@@ -106,6 +107,10 @@ class MainMenu(tk.Frame):  # main menu
                 colour = "r"
             figure.add_subplot(fc="#15151c").plot(df["Close time"], df["Close"].astype(float), "-" + colour)
             FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=graphs_x[index], rely=graphs_y[index])
+
+            # percentage change
+            change = (float(df["Close"][499]) - float(df["Close"][0])) / float(df["Close"][0])
+            percentage_change[index].append(str(round(change, 2)))
 
         # search bar
         search = tk.Entry(self, font=("Consolas", round(res_height / 28)), bg="#15151c", fg="#3ac7c2",
@@ -123,6 +128,19 @@ class MainMenu(tk.Frame):  # main menu
         gains_font = ("Consolas", round(res_height / 25))
         top_gains = tk.Label(self, text="(%) Change", font=gains_font, bg="#15151c", fg="#3ac7c2")
         top_gains.place(relx=(0.17 + ((0.8 / 3) * 2)), rely=0.27)
+
+        percentage_change.sort(key=lambda x: x[1], reverse=True)
+        y = 0.38
+        for change in percentage_change:
+            if float(change[1]) > 0:
+                symbol = "+"
+            elif float(change[1]) < 0:
+                symbol = "-"
+            else:
+                symbol = ""
+            tk.Label(self, text=f"{change[0]} - {symbol}{change[1]}%", font=gains_font, bg="#15151c", fg="#67676b")\
+                .place(relx=(0.17 + ((0.8 / 3) * 2)), rely=y)
+            y += 0.09
 
         # settings button
         self.cog_image = ImageTk.PhotoImage(Image.open("images/cog.png")
