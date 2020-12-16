@@ -23,7 +23,7 @@ def rel_width(multiplier): return round(multiplier * res_width)
 def rel_height(multiplier): return round(multiplier * res_height)
 
 
-# root class
+# app class
 class Application(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
@@ -34,7 +34,7 @@ class Application(tk.Tk):
         self.frames = {}
 
         # cycle through windows
-        for F in (Startup, MainMenu, PageTwo):
+        for F in (Startup, MainMenu, CoinPage):
             frame = F(container)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
@@ -92,16 +92,16 @@ class MainMenu(tk.Frame):  # main menu
         # graphs
         graph_coins = ["BTC", "ETH", "XRP", "LTC", "LINK", "ADA"]
         graphs_x = [0.05, 0.05, 0.05, 0.1 + (0.8 / 3), 0.1 + (0.8 / 3), 0.1 + (0.8 / 3)]
-        graphs_y = [0.25, 0.5, 0.75, 0.25, 0.5, 0.75]
+        graphs_y = [0.25, 0.5, 0.75, 0.25, 0.5, 0.75]  # how much to move each iteration
         percentage_change = [["BTC"], ["ETH"], ["XRP"], ["LTC"], ["LINK"], ["ADA"]]
         for index in range(6):
-            df = pd.DataFrame(get_klines(graph_coins[index] + "USDT", "1m"),
+            df = pd.DataFrame(get_klines(graph_coins[index] + "USDT", "1h", 24),
                               columns=["Open time", "Open", "High", "Low", "Close", "Volume",
                                        "Close time", "Quote asset volume", "Number of trades",
                                        "Taker buy base asset volume",
                                        "Taker buy quote asset volume", "Ignore."])
             figure = plt.Figure(figsize=((0.8 / 3) * res_width / 100, 0.2 * res_height / 100), facecolor="#67676b")
-            if df["Close"][499] > df["Close"][0]:
+            if df["Close"][23] > df["Close"][0]:
                 colour = "g"
             else:
                 colour = "r"
@@ -109,14 +109,28 @@ class MainMenu(tk.Frame):  # main menu
             FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=graphs_x[index], rely=graphs_y[index])
 
             # percentage change
-            change = (float(df["Close"][499]) - float(df["Close"][0])) / float(df["Close"][0])
+            change = (float(df["Close"][23]) - float(df["Close"][0])) / float(df["Close"][0])
             percentage_change[index].append(str(round(change, 2)))
 
         # search bar
         search = tk.Entry(self, font=("Consolas", round(res_height / 28)), bg="#15151c", fg="#3ac7c2",
                           highlightbackground="#67676b")
         search.insert(0, " Search")
+
+        def clear_search(event):
+            search.insert(0, " ")
+            search.delete(1, tk.END)
+
+        search.bind("<Button-1>", clear_search)
         search.place(relx=0.35, rely=0.06, width=0.3 * res_width, height=0.1 * res_height)
+
+        def initiate_search(event):
+            arg = search.get().strip()
+            CoinPage.load_page(app.frames[CoinPage], arg)
+            self.update_idletasks()  # make page transition less choppy
+            app.show_frame(CoinPage)
+
+        search.bind("<Return>", initiate_search)
 
         # grid on right
         canvas.create_rectangle(round((0.15 + ((0.8 / 3) * 2)) * res_width), round(0.25 * res_height),
@@ -134,11 +148,9 @@ class MainMenu(tk.Frame):  # main menu
         for change in percentage_change:
             if float(change[1]) > 0:
                 symbol = "+"
-            elif float(change[1]) < 0:
-                symbol = "-"
             else:
                 symbol = ""
-            tk.Label(self, text=f"{change[0]} - {symbol}{change[1]}%", font=gains_font, bg="#15151c", fg="#67676b")\
+            tk.Label(self, text=f"{change[0]} - {symbol}{change[1]}%", font=gains_font, bg="#15151c", fg="#67676b") \
                 .place(relx=(0.17 + ((0.8 / 3) * 2)), rely=y)
             y += 0.09
 
@@ -146,16 +158,36 @@ class MainMenu(tk.Frame):  # main menu
         self.cog_image = ImageTk.PhotoImage(Image.open("images/cog.png")
                                             .resize((rel_width(0.08), rel_height(0.14)), Image.ANTIALIAS))
         settings = tk.Button(self, image=self.cog_image, text="test", bg="#15151c", highlightthickness=0, bd=0,
-                             activebackground="#15151c", command=lambda: app.show_frame(PageTwo))
+                             activebackground="#15151c", command=lambda: app.show_frame(CoinPage))
         settings.place(relx=0.05, rely=0.05, width=rel_width(0.08), height=rel_height(0.14))
 
 
-class PageTwo(tk.Frame):  # second page
+class CoinPage(tk.Frame):  # second page
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
+    
+    def load_page(self, coin):
         self.configure(bg="#15151c")
-        tk.Label(self, text="pg2", font=("Consolas", 40), fg="#67676b", bg="#15151c").pack()
-        tk.Button(self, text="Return", command=lambda: app.show_frame(MainMenu)).pack()
+
+        def clear_page():
+            for child in self.winfo_children():
+                child.destroy()
+            app.show_frame(MainMenu)
+
+        tk.Label(self, text=coin.upper()+" / USDT", font=("Consolas", 40), fg="#67676b", bg="#15151c").pack()
+
+        df = pd.DataFrame(get_klines(coin + "USDT", "1m", 1000),
+                          columns=["Open time", "Open", "High", "Low", "Close", "Volume",
+                                   "Close time", "Quote asset volume", "Number of trades",
+                                   "Taker buy base asset volume",
+                                   "Taker buy quote asset volume", "Ignore."])
+        figure = plt.Figure(figsize=(0.7 * res_width / 100, 0.5 * res_height / 100), facecolor="#67676b")
+        if df["Close"][999] > df["Close"][0]:
+            colour = "g"
+        else:
+            colour = "r"
+        figure.add_subplot(fc="#15151c").plot(df["Close time"], df["Close"].astype(float), "-" + colour)
+        FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.1, rely=0.1)
 
 
 # launch application
