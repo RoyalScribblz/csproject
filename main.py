@@ -169,10 +169,12 @@ class CoinPage(tk.Frame):  # second page
     def load_page(self, coin):
         self.configure(bg="#15151c")
 
-        def clear_page():
+        def clear_page(event):
             for child in self.winfo_children():
                 child.destroy()
             app.show_frame(MainMenu)
+
+        app.bind("<Escape>", clear_page)
 
         tk.Label(self, text=coin.upper()+" / USDT", font=("Consolas", 40), fg="#67676b", bg="#15151c").pack()
 
