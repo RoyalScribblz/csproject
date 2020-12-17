@@ -7,6 +7,7 @@ import sys
 from PIL import ImageTk, Image
 import pandas as pd
 from binance_wrapper import get_klines
+from indicators import rsi
 
 # current directory and platform (either linux or win32)
 cdir = os.getcwd()
@@ -101,7 +102,9 @@ class MainMenu(tk.Frame):  # main menu
                                        "Taker buy base asset volume",
                                        "Taker buy quote asset volume", "Ignore."])
             figure = plt.Figure(figsize=((0.8 / 3) * res_width / 100, 0.2 * res_height / 100), facecolor="#67676b")
-            if df["Close"][23] > df["Close"][0]:
+            start_price = float(df["Close"][0])
+            end_price = float(df["Close"][23])
+            if end_price > start_price:
                 colour = "g"
             else:
                 colour = "r"
@@ -109,7 +112,7 @@ class MainMenu(tk.Frame):  # main menu
             FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=graphs_x[index], rely=graphs_y[index])
 
             # percentage change
-            change = (float(df["Close"][23]) - float(df["Close"][0])) / float(df["Close"][0])
+            change = (end_price - start_price) / start_price
             percentage_change[index].append(str(round(change, 2)))
 
         # search bar
@@ -183,13 +186,17 @@ class CoinPage(tk.Frame):  # second page
                                    "Close time", "Quote asset volume", "Number of trades",
                                    "Taker buy base asset volume",
                                    "Taker buy quote asset volume", "Ignore."])
-        figure = plt.Figure(figsize=(0.7 * res_width / 100, 0.5 * res_height / 100), facecolor="#67676b")
-        if df["Close"][999] > df["Close"][0]:
+        figure = plt.Figure(figsize=(0.5 * res_width / 100, 0.8 * res_height / 100), facecolor="#67676b")
+        start_price = float(df["Close"][0])
+        end_price = float(df["Close"][999])
+        if end_price > start_price:
             colour = "g"
         else:
             colour = "r"
         figure.add_subplot(fc="#15151c").plot(df["Close time"], df["Close"].astype(float), "-" + colour)
         FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.1, rely=0.1)
+
+        print(rsi(df))
 
 
 # launch application
