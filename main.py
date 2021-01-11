@@ -81,7 +81,7 @@ class MainMenu(tk.Frame):  # main menu
         # working clock
         clock_font = ("Consolas", rel_height(0.04))
         clock = tk.Label(self, font=clock_font, bg="#15151c", fg="#67676b")
-        clock.place(relx=0.85, rely=0.07)
+        clock.place(relx=0.8, rely=0.08)
 
         def tick():
             clock.config(text=strftime("%H:%M:%S"))
@@ -109,7 +109,7 @@ class MainMenu(tk.Frame):  # main menu
             FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=graphs_x[index], rely=graphs_y[index])
 
             # percentage change
-            change = (float(df["Close"][23]) - float(df["Close"][0])) / float(df["Close"][0])
+            change = (float(df["Close"][23]) - float(df["Close"][0])) / float(df["Close"][0]) * 100
             percentage_change[index].append(str(round(change, 2)))
 
         # search bar
@@ -143,15 +143,18 @@ class MainMenu(tk.Frame):  # main menu
         top_gains = tk.Label(self, text="(%) Change", font=gains_font, bg="#15151c", fg="#3ac7c2")
         top_gains.place(relx=(0.17 + ((0.8 / 3) * 2)), rely=0.27)
 
-        percentage_change.sort(key=lambda x: x[1], reverse=True)
+        percentage_change.sort(key=lambda x: x[1], reverse=False)
         y = 0.38
         for change in percentage_change:
             if float(change[1]) > 0:
                 symbol = "+"
             else:
                 symbol = ""
-            tk.Label(self, text=f"{change[0]} - {symbol}{change[1]}%", font=gains_font, bg="#15151c", fg="#67676b") \
-                .place(relx=(0.17 + ((0.8 / 3) * 2)), rely=y)
+            name = change[0]  # for equal spacing
+            while len(name) < 4:
+                name += " "  # add a space until 4 characters long
+            tk.Label(self, text=f"{name} | {symbol}{change[1]}%", font=gains_font, bg="#15151c", fg="#67676b") \
+                .place(relx=(0.165 + ((0.8 / 3) * 2)), rely=y)
             y += 0.09
 
         # settings button
@@ -159,7 +162,7 @@ class MainMenu(tk.Frame):  # main menu
                                             .resize((rel_width(0.08), rel_height(0.14)), Image.ANTIALIAS))
         settings = tk.Button(self, image=self.cog_image, text="test", bg="#15151c", highlightthickness=0, bd=0,
                              activebackground="#15151c", command=lambda: app.show_frame(CoinPage))
-        settings.place(relx=0.05, rely=0.05, width=rel_width(0.08), height=rel_height(0.14))
+        settings.place(relx=0.06, rely=0.05, width=rel_width(0.08), height=rel_height(0.14))
 
 
 class CoinPage(tk.Frame):  # second page
