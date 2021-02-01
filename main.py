@@ -146,7 +146,7 @@ class MainMenu(tk.Frame):  # main menu
         top_gains = tk.Label(self, text="(%) Change", font=gains_font, bg="#15151c", fg="#3ac7c2")
         top_gains.place(relx=(0.17 + ((0.8 / 3) * 2)), rely=0.27)
 
-        percentage_change.sort(key=lambda x: x[1], reverse=False)
+        percentage_change.sort(key=lambda x: float(x[1]), reverse=True)
         y = 0.38
         for change in percentage_change:
             if float(change[1]) > 0:
