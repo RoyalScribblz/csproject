@@ -7,6 +7,7 @@ import sys
 from PIL import ImageTk, Image
 import pandas as pd
 from binance_wrapper import get_klines
+import threading
 from indicators import rsi
 
 # current directory and platform (either linux or win32)
@@ -90,30 +91,50 @@ class MainMenu(tk.Frame):  # main menu
 
         tick()
 
-        # graphs
-        graph_coins = ["BTC", "ETH", "XRP", "LTC", "LINK", "ADA"]
-        graphs_x = [0.05, 0.05, 0.05, 0.1 + (0.8 / 3), 0.1 + (0.8 / 3), 0.1 + (0.8 / 3)]
-        graphs_y = [0.25, 0.5, 0.75, 0.25, 0.5, 0.75]  # how much to move each iteration
-        percentage_change = [["BTC"], ["ETH"], ["XRP"], ["LTC"], ["LINK"], ["ADA"]]
-        for index in range(6):
-            df = pd.DataFrame(get_klines(graph_coins[index] + "USDT", "1h", 24),
-                              columns=["Open time", "Open", "High", "Low", "Close", "Volume",
-                                       "Close time", "Quote asset volume", "Number of trades",
-                                       "Taker buy base asset volume",
-                                       "Taker buy quote asset volume", "Ignore."])
-            figure = plt.Figure(figsize=((0.8 / 3) * res_width / 100, 0.2 * res_height / 100), facecolor="#67676b")
-            start_price = float(df["Close"][0])
-            end_price = float(df["Close"][23])
-            if end_price > start_price:
-                colour = "g"
-            else:
-                colour = "r"
-            figure.add_subplot(fc="#15151c").plot(df["Close time"], df["Close"].astype(float), "-" + colour)
-            FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=graphs_x[index], rely=graphs_y[index])
+        gains_font = ("Consolas", round(res_height / 25))
 
-            # percentage change
-            change = (end_price - start_price) / start_price
-            percentage_change[index].append(str(round(change, 2)))
+        def graph_drawing():
+            # graphs
+            graph_coins = ["BTC", "ETH", "XRP", "LTC", "LINK", "ADA"]
+            graphs_x = [0.05, 0.05, 0.05, 0.1 + (0.8 / 3), 0.1 + (0.8 / 3), 0.1 + (0.8 / 3)]
+            graphs_y = [0.25, 0.5, 0.75, 0.25, 0.5, 0.75]  # how much to move each iteration
+            percentage_change = [["BTC"], ["ETH"], ["XRP"], ["LTC"], ["LINK"], ["ADA"]]
+            for index in range(6):
+
+                df = pd.DataFrame(get_klines(graph_coins[index] + "USDT", "1h", 24),
+                                  columns=["Open time", "Open", "High", "Low", "Close", "Volume",
+                                           "Close time", "Quote asset volume", "Number of trades",
+                                           "Taker buy base asset volume",
+                                           "Taker buy quote asset volume", "Ignore."])
+                figure = plt.Figure(figsize=((0.8 / 3) * res_width / 100, 0.2 * res_height / 100), facecolor="#67676b")
+                start_price = float(df["Close"][0])
+                end_price = float(df["Close"][23])
+                if end_price > start_price:
+                    colour = "g"
+                else:
+                    colour = "r"
+                figure.add_subplot(fc="#15151c").plot(df["Close time"], df["Close"].astype(float), "-" + colour)
+                FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=graphs_x[index], rely=graphs_y[index])
+
+                # percentage change
+                change = (end_price - start_price) / start_price
+                percentage_change[index].append(str(round(change, 2)))
+
+            # coin list on right
+            percentage_change.sort(key=lambda x: float(x[1]), reverse=True)
+            y = 0.38
+            for change in percentage_change:
+                if float(change[1]) > 0:
+                    symbol = "+"
+                else:
+                    symbol = ""
+                name = change[0]  # for equal spacing
+                while len(name) < 4:
+                    name += " "  # add a space until 4 characters long
+                tk.Label(self, text=f"{name} | {symbol}{change[1]}%", font=gains_font, bg="#15151c", fg="#67676b") \
+                    .place(relx=(0.165 + ((0.8 / 3) * 2)), rely=y)
+                y += 0.09
+        threading.Thread(target=graph_drawing).start()
 
         # search bar
         search = tk.Entry(self, font=("Consolas", round(res_height / 28)), bg="#15151c", fg="#3ac7c2",
@@ -142,23 +163,8 @@ class MainMenu(tk.Frame):  # main menu
         canvas.create_line(round((0.15 + ((0.8 / 3) * 2)) * res_width), round(0.35 * res_height),
                            round((0.15 + ((0.8 / 3) * 3)) * res_width), round(0.35 * res_height),
                            width=5, fill="#67676b")
-        gains_font = ("Consolas", round(res_height / 25))
         top_gains = tk.Label(self, text="(%) Change", font=gains_font, bg="#15151c", fg="#3ac7c2")
         top_gains.place(relx=(0.17 + ((0.8 / 3) * 2)), rely=0.27)
-
-        percentage_change.sort(key=lambda x: float(x[1]), reverse=True)
-        y = 0.38
-        for change in percentage_change:
-            if float(change[1]) > 0:
-                symbol = "+"
-            else:
-                symbol = ""
-            name = change[0]  # for equal spacing
-            while len(name) < 4:
-                name += " "  # add a space until 4 characters long
-            tk.Label(self, text=f"{name} | {symbol}{change[1]}%", font=gains_font, bg="#15151c", fg="#67676b") \
-                .place(relx=(0.165 + ((0.8 / 3) * 2)), rely=y)
-            y += 0.09
 
         # settings button
         self.cog_image = ImageTk.PhotoImage(Image.open("images/cog.png")
@@ -184,20 +190,22 @@ class CoinPage(tk.Frame):  # second page
 
         tk.Label(self, text=coin.upper()+" / USDT", font=("Consolas", 40), fg="#67676b", bg="#15151c").pack()
 
-        df = pd.DataFrame(get_klines(coin + "USDT", "1m", 1000),
-                          columns=["Open time", "Open", "High", "Low", "Close", "Volume",
-                                   "Close time", "Quote asset volume", "Number of trades",
-                                   "Taker buy base asset volume",
-                                   "Taker buy quote asset volume", "Ignore."])
-        figure = plt.Figure(figsize=(0.5 * res_width / 100, 0.8 * res_height / 100), facecolor="#67676b")
-        start_price = float(df["Close"][0])
-        end_price = float(df["Close"][999])
-        if end_price > start_price:
-            colour = "g"
-        else:
-            colour = "r"
-        figure.add_subplot(fc="#15151c").plot(df["Close time"], df["Close"].astype(float), "-" + colour)
-        FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.1, rely=0.1)
+        def draw_graph():
+            df = pd.DataFrame(get_klines(coin + "USDT", "1m", 1000),
+                              columns=["Open time", "Open", "High", "Low", "Close", "Volume",
+                                       "Close time", "Quote asset volume", "Number of trades",
+                                       "Taker buy base asset volume",
+                                       "Taker buy quote asset volume", "Ignore."])
+            figure = plt.Figure(figsize=(0.5 * res_width / 100, 0.8 * res_height / 100), facecolor="#67676b")
+            start_price = float(df["Close"][0])
+            end_price = float(df["Close"][999])
+            if end_price > start_price:
+                colour = "g"
+            else:
+                colour = "r"
+            figure.add_subplot(fc="#15151c").plot(df["Close time"], df["Close"].astype(float), "-" + colour)
+            FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.1, rely=0.1)
+        threading.Thread(target=draw_graph).start()
 
 
 # launch application
