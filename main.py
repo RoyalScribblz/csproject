@@ -8,7 +8,7 @@ from PIL import ImageTk, Image
 import pandas as pd
 from binance_wrapper import get_klines
 import threading
-from indicators import rsi
+import indicators
 
 # current directory and platform (either linux or win32)
 cdir = os.getcwd()
@@ -196,7 +196,7 @@ class CoinPage(tk.Frame):  # second page
                                        "Close time", "Quote asset volume", "Number of trades",
                                        "Taker buy base asset volume",
                                        "Taker buy quote asset volume", "Ignore."])
-            figure = plt.Figure(figsize=(0.5 * res_width / 100, 0.8 * res_height / 100), facecolor="#67676b")
+            figure = plt.Figure(figsize=(0.5 * res_width / 100, 0.75 * res_height / 100), facecolor="#67676b")
             start_price = float(df["Close"][0])
             end_price = float(df["Close"][999])
             if end_price > start_price:
@@ -204,7 +204,19 @@ class CoinPage(tk.Frame):  # second page
             else:
                 colour = "r"
             figure.add_subplot(fc="#15151c").plot(df["Close time"], df["Close"].astype(float), "-" + colour)
-            FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.1, rely=0.1)
+
+            # moving average
+            moving_avg = indicators.moving_avg(df)
+            figure.add_subplot(fc="#15151c").plot(df["Close time"], moving_avg, "-w")
+
+            FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.1, rely=0.08)
+
+            # relative strength index
+            rsi_df = indicators.rsi(df, 800)
+            figure = plt.Figure(figsize=(0.5 * res_width / 100, 0.2 * res_height / 100), facecolor="#67676b")
+            figure.add_subplot(fc="#15151c").plot(df["Close time"], rsi_df.tolist(), "-m")
+            FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.1, rely=0.7)
+
         threading.Thread(target=draw_graph).start()
 
 
