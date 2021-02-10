@@ -101,11 +101,7 @@ class MainMenu(tk.Frame):  # main menu
             percentage_change = [["BTC"], ["ETH"], ["XRP"], ["LTC"], ["LINK"], ["ADA"]]
             for index in range(6):
 
-                df = pd.DataFrame(get_klines(graph_coins[index] + "USDT", "1h", 24),
-                                  columns=["Open time", "Open", "High", "Low", "Close", "Volume",
-                                           "Close time", "Quote asset volume", "Number of trades",
-                                           "Taker buy base asset volume",
-                                           "Taker buy quote asset volume", "Ignore."])
+                df = get_klines(graph_coins[index] + "USDT", 1, "h", 24)
                 figure = plt.Figure(figsize=((0.8 / 3) * res_width / 100, 0.2 * res_height / 100), facecolor="#67676b")
                 start_price = float(df["Close"][0])
                 end_price = float(df["Close"][23])
@@ -117,7 +113,7 @@ class MainMenu(tk.Frame):  # main menu
                 FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=graphs_x[index], rely=graphs_y[index])
 
                 # percentage change
-                change = (end_price - start_price) / start_price
+                change = ((end_price - start_price) / start_price) * 100
                 percentage_change[index].append(str(round(change, 2)))
 
             # coin list on right
@@ -191,14 +187,10 @@ class CoinPage(tk.Frame):  # second page
         tk.Label(self, text=coin.upper()+" / USDT", font=("Consolas", 40), fg="#67676b", bg="#15151c").pack()
 
         def draw_graph():
-            df = pd.DataFrame(get_klines(coin + "USDT", "1m", 1000),
-                              columns=["Open time", "Open", "High", "Low", "Close", "Volume",
-                                       "Close time", "Quote asset volume", "Number of trades",
-                                       "Taker buy base asset volume",
-                                       "Taker buy quote asset volume", "Ignore."])
+            df = get_klines(coin + "USDT", 1, "m", 1440)
             figure = plt.Figure(figsize=(0.5 * res_width / 100, 0.75 * res_height / 100), facecolor="#67676b")
             start_price = float(df["Close"][0])
-            end_price = float(df["Close"][999])
+            end_price = float(df["Close"][880])
             if end_price > start_price:
                 colour = "g"
             else:
@@ -212,9 +204,14 @@ class CoinPage(tk.Frame):  # second page
             FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.1, rely=0.08)
 
             # relative strength index
-            rsi_df = indicators.rsi(df, 800)
+            rsi_df = indicators.rsi(df, 14)
             figure = plt.Figure(figsize=(0.5 * res_width / 100, 0.2 * res_height / 100), facecolor="#67676b")
             figure.add_subplot(fc="#15151c").plot(df["Close time"], rsi_df.tolist(), "-m")
+
+            # rsi moving avg
+            moving_avg = indicators.moving_avg(rsi_df)
+            figure.add_subplot(fc="#15151c").plot(df["Close time"], moving_avg, "-w")
+
             FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.1, rely=0.7)
 
         threading.Thread(target=draw_graph).start()

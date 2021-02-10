@@ -1,3 +1,6 @@
+import pandas as pd
+
+
 def rsi(dataframe, n=14):
     delta = dataframe["Close"].astype(float).diff()
     delta_up, delta_down = delta.copy(), delta.copy()
@@ -11,4 +14,9 @@ def rsi(dataframe, n=14):
 
 
 def moving_avg(dataframe, n=14):
-    return dataframe["Close"].astype(float).rolling(n).mean()
+    if isinstance(dataframe, pd.DataFrame):  # Series vs DataFrame
+        rolling_mean = dataframe["Close"].astype(float).rolling(n).mean()
+    else:
+        rolling_mean = dataframe.rolling(n).mean()
+
+    return rolling_mean
