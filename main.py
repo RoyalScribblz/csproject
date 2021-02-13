@@ -184,13 +184,14 @@ class CoinPage(tk.Frame):  # second page
 
         app.bind("<Escape>", clear_page)
 
-        tk.Label(self, text=coin.upper()+" / USDT", font=("Consolas", 40), fg="#67676b", bg="#15151c").pack()
+        tk.Label(self, text=coin.upper()+" / USDT", font=("Consolas", 40), fg="#67676b", bg="#15151c")\
+            .pack(pady=rel_height(0.02))
 
         def draw_graph():
             df = get_klines(coin + "USDT", 1, "m", 1440)
-            figure = plt.Figure(figsize=(0.5 * res_width / 100, 0.75 * res_height / 100), facecolor="#67676b")
+            figure = plt.Figure(figsize=(0.7 * res_width / 100, 0.75 * res_height / 100), facecolor="#67676b")
             start_price = float(df["Close"][0])
-            end_price = float(df["Close"][880])
+            end_price = float(df["Close"][1439])
             if end_price > start_price:
                 colour = "g"
             else:
@@ -201,18 +202,53 @@ class CoinPage(tk.Frame):  # second page
             moving_avg = indicators.moving_avg(df)
             figure.add_subplot(fc="#15151c").plot(df["Close time"], moving_avg, "-w")
 
-            FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.1, rely=0.08)
+            FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.02, rely=0.08)
 
             # relative strength index
-            rsi_df = indicators.rsi(df, 14)
-            figure = plt.Figure(figsize=(0.5 * res_width / 100, 0.2 * res_height / 100), facecolor="#67676b")
-            figure.add_subplot(fc="#15151c").plot(df["Close time"], rsi_df.tolist(), "-m")
+            rsi_df1 = indicators.rsi(df, 14)
+            figure = plt.Figure(figsize=(0.7 * res_width / 100, 0.2 * res_height / 100), facecolor="#67676b")
+            figure.add_subplot(fc="#15151c").plot(df["Close time"], rsi_df1.tolist(), "-b")
 
-            # rsi moving avg
-            moving_avg = indicators.moving_avg(rsi_df)
-            figure.add_subplot(fc="#15151c").plot(df["Close time"], moving_avg, "-w")
+            # relative strength index
+            rsi_df2 = indicators.rsi(df, 28)
+            figure.add_subplot(fc="#15151c").plot(df["Close time"], rsi_df2.tolist(), "-m")
 
-            FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.1, rely=0.7)
+            # relative strength index
+            rsi_df3 = indicators.rsi(df, 56)
+            figure.add_subplot(fc="#15151c").plot(df["Close time"], rsi_df3.tolist(), "-y")
+
+            FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.02, rely=0.7)
+
+            # right hand side stats
+            stats_font = ("Consolas", round(res_height / 34))
+
+            tk.Label(self, text="Price Now: $" + str(end_price), font=stats_font, bg="#15151c", fg="#3ac7c2")\
+                .place(relx=0.74, rely=0.1)
+
+            day_high = round(float(df["Close"].max()), 2)
+            tk.Label(self, text="24hr High: $" + str(day_high), font=stats_font, bg="#15151c", fg="#3ac7c2") \
+                .place(relx=0.74, rely=0.18)
+
+            day_low = round(float(df["Close"].min()), 2)
+            tk.Label(self, text="24hr Low: $" + str(day_low), font=stats_font, bg="#15151c", fg="#3ac7c2") \
+                .place(relx=0.74, rely=0.26)
+
+            per_change = round(((end_price - start_price) / start_price) * 100, 2)
+            per_change = "+" + str(per_change) if per_change > 0 else "" + str(per_change)
+            tk.Label(self, text="24hr Change: " + per_change + "%", font=stats_font, bg="#15151c", fg="#3ac7c2") \
+                .place(relx=0.74, rely=0.34)
+
+            current_rsi1 = round(rsi_df1.iloc[-1], 4)
+            tk.Label(self, text="14m RSI: " + str(current_rsi1), font=stats_font, bg="#15151c", fg="#3ac7c2") \
+                .place(relx=0.74, rely=0.42)
+
+            current_rsi2 = round(rsi_df2.iloc[-1], 4)
+            tk.Label(self, text="28m RSI: " + str(current_rsi2), font=stats_font, bg="#15151c", fg="#3ac7c2") \
+                .place(relx=0.74, rely=0.50)
+
+            current_rsi3 = round(rsi_df3.iloc[-1], 4)
+            tk.Label(self, text="56m RSI: " + str(current_rsi3), font=stats_font, bg="#15151c", fg="#3ac7c2") \
+                .place(relx=0.74, rely=0.58)
 
         threading.Thread(target=draw_graph).start()
 
