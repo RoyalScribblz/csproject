@@ -5,10 +5,12 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import os
 import sys
 from PIL import ImageTk, Image
-import pandas as pd
 from binance_wrapper import get_klines
 import threading
 import indicators
+import json
+from coingecko_wrapper import get_cg
+import utilities as utils
 
 # current directory and platform (either linux or win32)
 cdir = os.getcwd()
@@ -145,7 +147,7 @@ class MainMenu(tk.Frame):  # main menu
         search.place(relx=0.35, rely=0.06, width=0.3 * res_width, height=0.1 * res_height)
 
         def initiate_search(event):
-            arg = search.get().strip()
+            arg = search.get().strip().upper()
             CoinPage.load_page(app.frames[CoinPage], arg)
             self.update_idletasks()  # make page transition less choppy
             app.show_frame(CoinPage)
@@ -184,12 +186,15 @@ class CoinPage(tk.Frame):  # second page
 
         app.bind("<Escape>", clear_page)
 
-        tk.Label(self, text=coin.upper()+" / USDT", font=("Consolas", 40), fg="#67676b", bg="#15151c")\
-            .pack(pady=rel_height(0.02))
+        tk.Label(self, text=coin+" / USDT", font=("Consolas", 40), fg="#67676b", bg="#15151c")\
+            .pack(pady=rel_height(0.01))
+
+        stats_font = ("Consolas", round(res_height / 34))
 
         def draw_graph():
             df = get_klines(coin + "USDT", 1, "m", 1440)
-            figure = plt.Figure(figsize=(0.7 * res_width / 100, 0.75 * res_height / 100), facecolor="#67676b")
+
+            figure = plt.Figure(figsize=(0.7 * res_width / 100, 0.65 * res_height / 100), facecolor="#67676b")
             start_price = float(df["Close"][0])
             end_price = float(df["Close"][1439])
             if end_price > start_price:
@@ -202,7 +207,7 @@ class CoinPage(tk.Frame):  # second page
             moving_avg = indicators.moving_avg(df)
             figure.add_subplot(fc="#15151c").plot(df["Close time"], moving_avg, "-w")
 
-            FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.02, rely=0.08)
+            FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.02, rely=0.2)
 
             # relative strength index
             rsi_df1 = indicators.rsi(df, 14)
@@ -217,40 +222,72 @@ class CoinPage(tk.Frame):  # second page
             rsi_df3 = indicators.rsi(df, 56)
             figure.add_subplot(fc="#15151c").plot(df["Close time"], rsi_df3.tolist(), "-y")
 
-            FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.02, rely=0.7)
+            FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.02, rely=0.8)
+
+            # volume graph
+            figure = plt.Figure(figsize=(0.7 * res_width / 100, 0.2 * res_height / 100), facecolor="#67676b")
+            figure.add_subplot(fc="#15151c").plot(df["Close time"], df["Volume"].astype(float), "-w")
+            FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.02, rely=0.06)
 
             # right hand side stats
-            stats_font = ("Consolas", round(res_height / 34))
 
-            tk.Label(self, text="Price Now: $" + str(end_price), font=stats_font, bg="#15151c", fg="#3ac7c2")\
-                .place(relx=0.74, rely=0.1)
+            tk.Label(self, text="Price Now: $" + "{:,.2f}".format(end_price), font=stats_font, bg="#15151c", fg="#3ac7c2")\
+                .place(relx=0.73, rely=0.1)
 
             day_high = round(float(df["Close"].max()), 2)
-            tk.Label(self, text="24hr High: $" + str(day_high), font=stats_font, bg="#15151c", fg="#3ac7c2") \
-                .place(relx=0.74, rely=0.18)
+            tk.Label(self, text="24hr High: $" + "{:,.2f}".format(day_high), font=stats_font, bg="#15151c", fg="#3ac7c2") \
+                .place(relx=0.73, rely=0.18)
 
             day_low = round(float(df["Close"].min()), 2)
-            tk.Label(self, text="24hr Low: $" + str(day_low), font=stats_font, bg="#15151c", fg="#3ac7c2") \
-                .place(relx=0.74, rely=0.26)
+            tk.Label(self, text="24hr Low: $" + "{:,.2f}".format(day_low), font=stats_font, bg="#15151c", fg="#3ac7c2") \
+                .place(relx=0.73, rely=0.26)
 
             per_change = round(((end_price - start_price) / start_price) * 100, 2)
             per_change = "+" + str(per_change) if per_change > 0 else "" + str(per_change)
             tk.Label(self, text="24hr Change: " + per_change + "%", font=stats_font, bg="#15151c", fg="#3ac7c2") \
-                .place(relx=0.74, rely=0.34)
+                .place(relx=0.73, rely=0.34)
 
             current_rsi1 = round(rsi_df1.iloc[-1], 4)
             tk.Label(self, text="14m RSI: " + str(current_rsi1), font=stats_font, bg="#15151c", fg="#3ac7c2") \
-                .place(relx=0.74, rely=0.42)
+                .place(relx=0.73, rely=0.42)
 
             current_rsi2 = round(rsi_df2.iloc[-1], 4)
             tk.Label(self, text="28m RSI: " + str(current_rsi2), font=stats_font, bg="#15151c", fg="#3ac7c2") \
-                .place(relx=0.74, rely=0.50)
+                .place(relx=0.73, rely=0.50)
 
             current_rsi3 = round(rsi_df3.iloc[-1], 4)
             tk.Label(self, text="56m RSI: " + str(current_rsi3), font=stats_font, bg="#15151c", fg="#3ac7c2") \
-                .place(relx=0.74, rely=0.58)
+                .place(relx=0.73, rely=0.58)
 
         threading.Thread(target=draw_graph).start()
+
+        def coin_gecko_stats():
+            cg_id = None
+            with open("cg_coins.json", "r") as cg_file:
+                cg_ids = json.load(cg_file)
+                for item in cg_ids:
+                    if item["symbol"].upper() == coin:
+                        cg_id = item["id"]
+
+            if cg_id is None:
+                return
+            cg_data = get_cg(cg_id)
+
+            market_cap = cg_data["market_data"]["market_cap"]["usd"]
+            tk.Label(self, text="Market Cap: $" + utils.number_suffix(market_cap), font=stats_font, bg="#15151c", fg="#3ac7c2") \
+                .place(relx=0.73, rely=0.66)
+
+            volume = cg_data["market_data"]["total_volume"]["usd"]
+            tk.Label(self, text="Trade Volume: $" + utils.number_suffix(volume), font=stats_font, bg="#15151c",
+                     fg="#3ac7c2") \
+                .place(relx=0.73, rely=0.74)
+
+            ath = cg_data["market_data"]["ath"]["usd"]
+            tk.Label(self, text="All-Time Hi: $" + "{:,.2f}".format(ath), font=stats_font, bg="#15151c",
+                     fg="#3ac7c2") \
+                .place(relx=0.73, rely=0.82)
+
+        threading.Thread(target=coin_gecko_stats).start()
 
 
 # launch application
