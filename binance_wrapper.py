@@ -4,6 +4,13 @@ import pandas as pd
 millis_time = {"m": 60000, "h": 3600000, "d": 86400000, "w": 604800000, "M": 2592000000}
 
 
+def is_code(response):
+    if type(response) is dict:
+        print("[Binance] Error " + str(response["code"]) + ", " + response["msg"])
+        return True
+    return False
+
+
 def get_klines(symbol, interval_num, interval_letter, limit):
     interval = str(interval_num) + interval_letter
     if not interval.endswith(("m", "h", "d", "w", "M")):  # require interval format
@@ -18,6 +25,10 @@ def get_klines(symbol, interval_num, interval_letter, limit):
 
     response = requests.get("https://api.binance.com/api/v3/klines?symbol=" + symbol.upper() + "&interval="
                             + interval + "&limit=" + str(remainder)).json()
+
+    if is_code(response):
+        return None
+
     responses.extend(response)
     limit -= remainder
 
@@ -28,6 +39,10 @@ def get_klines(symbol, interval_num, interval_letter, limit):
 
         response = requests.get("https://api.binance.com/api/v3/klines?symbol=" + symbol.upper() + "&interval="
                                 + interval + "&limit=1000&startTime=" + str(open_time)).json()
+
+        if is_code(response):
+            break
+
         responses.extend(response)
 
         limit -= 1000
