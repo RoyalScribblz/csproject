@@ -231,16 +231,16 @@ class CoinPage(tk.Frame):  # second page
 
             # right hand side stats
 
-            tk.Label(self, text="Price Now: $" + "{:,.2f}".format(end_price), font=stats_font, bg="#15151c", fg="#3ac7c2")\
-                .place(relx=0.73, rely=0.1)
+            tk.Label(self, text="Price Now: $" + "{:,.2f}".format(end_price), font=stats_font,
+                     bg="#15151c", fg="#3ac7c2").place(relx=0.73, rely=0.1)
 
             day_high = round(float(df["Close"].max()), 2)
-            tk.Label(self, text="24hr High: $" + "{:,.2f}".format(day_high), font=stats_font, bg="#15151c", fg="#3ac7c2") \
-                .place(relx=0.73, rely=0.18)
+            tk.Label(self, text="24hr High: $" + "{:,.2f}".format(day_high), font=stats_font,
+                     bg="#15151c", fg="#3ac7c2").place(relx=0.73, rely=0.18)
 
             day_low = round(float(df["Close"].min()), 2)
-            tk.Label(self, text="24hr Low: $" + "{:,.2f}".format(day_low), font=stats_font, bg="#15151c", fg="#3ac7c2") \
-                .place(relx=0.73, rely=0.26)
+            tk.Label(self, text="24hr Low: $" + "{:,.2f}".format(day_low), font=stats_font,
+                     bg="#15151c", fg="#3ac7c2").place(relx=0.73, rely=0.26)
 
             per_change = round(((end_price - start_price) / start_price) * 100, 2)
             per_change = "+" + str(per_change) if per_change > 0 else "" + str(per_change)
@@ -274,8 +274,8 @@ class CoinPage(tk.Frame):  # second page
             cg_data = get_cg(cg_id)
 
             market_cap = cg_data["market_data"]["market_cap"]["usd"]
-            tk.Label(self, text="Market Cap: $" + utils.number_suffix(market_cap), font=stats_font, bg="#15151c", fg="#3ac7c2") \
-                .place(relx=0.73, rely=0.66)
+            tk.Label(self, text="Market Cap: $" + utils.number_suffix(market_cap), font=stats_font,
+                     bg="#15151c", fg="#3ac7c2").place(relx=0.73, rely=0.66)
 
             volume = cg_data["market_data"]["total_volume"]["usd"]
             tk.Label(self, text="Trade Volume: $" + utils.number_suffix(volume), font=stats_font, bg="#15151c",
