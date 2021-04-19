@@ -18,8 +18,7 @@ def get_klines(symbol, interval_num, interval_letter, limit):
 
     millis_interval = interval_num * millis_time[interval_letter]
 
-    remainder = limit % 1000
-    remainder = remainder if remainder != 0 else 1000  # make sure the request gets data
+    remainder = limit % 1000 if limit % 1000 != 0 else 1000  # make sure the request gets data
 
     responses = []
 

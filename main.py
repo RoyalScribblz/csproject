@@ -97,13 +97,12 @@ class MainMenu(tk.Frame):  # main menu
 
         def graph_drawing():
             # graphs
-            graph_coins = ["BTC", "ETH", "XRP", "LTC", "LINK", "ADA"]
             graphs_x = [0.05, 0.05, 0.05, 0.1 + (0.8 / 3), 0.1 + (0.8 / 3), 0.1 + (0.8 / 3)]
             graphs_y = [0.25, 0.5, 0.75, 0.25, 0.5, 0.75]  # how much to move each iteration
-            percentage_change = [["BTC"], ["ETH"], ["XRP"], ["LTC"], ["LINK"], ["ADA"]]
+            fav_coins = [["BTC"], ["ETH"], ["XRP"], ["LTC"], ["LINK"], ["ADA"]]
             for index in range(6):
 
-                df = get_klines(graph_coins[index] + "USDT", 1, "h", 24)
+                df = get_klines(fav_coins[index][0] + "USDT", 1, "h", 24)
                 figure = plt.Figure(figsize=((0.8 / 3) * res_width / 100, 0.2 * res_height / 100), facecolor="#67676b")
                 start_price = float(df["Close"][0])
                 end_price = float(df["Close"][23])
@@ -116,12 +115,12 @@ class MainMenu(tk.Frame):  # main menu
 
                 # percentage change
                 change = ((end_price - start_price) / start_price) * 100
-                percentage_change[index].append(str(round(change, 2)))
+                fav_coins[index].append(str(round(change, 2)))
 
             # coin list on right
-            percentage_change.sort(key=lambda x: float(x[1]), reverse=True)
+            fav_coins.sort(key=lambda x: float(x[1]), reverse=True)
             y = 0.38
-            for change in percentage_change:
+            for change in fav_coins:
                 if float(change[1]) > 0:
                     symbol = "+"
                 else:
