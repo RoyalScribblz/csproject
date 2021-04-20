@@ -279,16 +279,16 @@ class CoinPage(tk.Frame):  # second page
 
             volume = cg_data["market_data"]["total_volume"]["usd"]
             tk.Label(self, text="Trade Volume: $" + utils.number_suffix(volume), font=stats_font, bg="#15151c",
-                     fg="#3ac7c2") \
-                .place(relx=0.73, rely=0.74)
+                     fg="#3ac7c2").place(relx=0.73, rely=0.74)
 
             ath = cg_data["market_data"]["ath"]["usd"]
             tk.Label(self, text="All-Time Hi: $" + "{:,.2f}".format(ath), font=stats_font, bg="#15151c",
-                     fg="#3ac7c2") \
-                .place(relx=0.73, rely=0.82)
+                     fg="#3ac7c2").place(relx=0.73, rely=0.82)
 
             daily_candles = get_klines(coin + "USDT", 1, "d", 100)
-            lstm()
+            ml_result = lstm(daily_candles["Close"].astype(float).tolist(), 1)[0]
+            tk.Label(self, text="24hr AI: $" + str(round(ml_result, 8)), font=stats_font, bg="#15151c",
+                     fg="#3ac7c2").place(relx=0.73, rely=0.90)
 
         threading.Thread(target=coin_gecko_stats).start()
 
