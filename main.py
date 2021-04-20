@@ -11,6 +11,7 @@ import indicators
 import json
 from coingecko_wrapper import get_cg
 import utilities as utils
+from lstm import lstm
 
 # current directory and platform (either linux or win32)
 cdir = os.getcwd()
@@ -285,6 +286,9 @@ class CoinPage(tk.Frame):  # second page
             tk.Label(self, text="All-Time Hi: $" + "{:,.2f}".format(ath), font=stats_font, bg="#15151c",
                      fg="#3ac7c2") \
                 .place(relx=0.73, rely=0.82)
+
+            daily_candles = get_klines(coin + "USDT", 1, "d", 100)
+            lstm()
 
         threading.Thread(target=coin_gecko_stats).start()
 
