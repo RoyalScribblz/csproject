@@ -39,7 +39,7 @@ class Application(tk.Tk):
         self.frames = {}
 
         # cycle through windows
-        for F in (Startup, MainMenu, CoinPage):
+        for F in (Startup, MainMenu, CoinPage, SettingsMenu):
             frame = F(container)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
@@ -90,7 +90,7 @@ class MainMenu(tk.Frame):  # main menu
 
         def tick():
             clock.config(text=strftime("%H:%M:%S"))
-            clock.after(1000, tick)
+            clock.after(500, tick)
 
         tick()
 
@@ -100,7 +100,9 @@ class MainMenu(tk.Frame):  # main menu
             # graphs
             graphs_x = [0.05, 0.05, 0.05, 0.1 + (0.8 / 3), 0.1 + (0.8 / 3), 0.1 + (0.8 / 3)]
             graphs_y = [0.25, 0.5, 0.75, 0.25, 0.5, 0.75]  # how much to move each iteration
-            fav_coins = [["BTC"], ["ETH"], ["XRP"], ["LTC"], ["LINK"], ["ADA"]]
+            with open("settings.json", "r") as settings_file:
+                faves = json.load(settings_file)["favourites"]
+                fav_coins = [[fav] for fav in faves]
             for index in range(6):
 
                 df = get_klines(fav_coins[index][0] + "USDT", 1, "h", 24)
@@ -132,6 +134,7 @@ class MainMenu(tk.Frame):  # main menu
                 tk.Label(self, text=f"{name} | {symbol}{change[1]}%", font=gains_font, bg="#15151c", fg="#67676b") \
                     .place(relx=(0.165 + ((0.8 / 3) * 2)), rely=y)
                 y += 0.09
+
         threading.Thread(target=graph_drawing).start()
 
         # search bar
@@ -165,17 +168,22 @@ class MainMenu(tk.Frame):  # main menu
         top_gains.place(relx=(0.17 + ((0.8 / 3) * 2)), rely=0.27)
 
         # settings button
+        def open_settings():
+            SettingsMenu.load_page(app.frames[SettingsMenu])
+            self.update_idletasks()  # make page transition less choppy
+            app.show_frame(SettingsMenu)
+
         self.cog_image = ImageTk.PhotoImage(Image.open("images/cog.png")
                                             .resize((rel_width(0.08), rel_height(0.14)), Image.ANTIALIAS))
         settings = tk.Button(self, image=self.cog_image, text="test", bg="#15151c", highlightthickness=0, bd=0,
-                             activebackground="#15151c", command=lambda: app.show_frame(CoinPage))
+                             activebackground="#15151c", command=lambda: open_settings())
         settings.place(relx=0.06, rely=0.05, width=rel_width(0.08), height=rel_height(0.14))
 
 
 class CoinPage(tk.Frame):  # second page
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
-    
+
     def load_page(self, coin):
         self.configure(bg="#15151c")
 
@@ -186,7 +194,7 @@ class CoinPage(tk.Frame):  # second page
 
         app.bind("<Escape>", clear_page)
 
-        tk.Label(self, text=coin+" / USDT", font=("Consolas", 40), fg="#67676b", bg="#15151c")\
+        tk.Label(self, text=coin + " / USDT", font=("Consolas", round(res_height / 48)), fg="#67676b", bg="#15151c") \
             .pack(pady=rel_height(0.01))
 
         stats_font = ("Consolas", round(res_height / 34))
@@ -291,6 +299,38 @@ class CoinPage(tk.Frame):  # second page
                      fg="#3ac7c2").place(relx=0.73, rely=0.90)
 
         threading.Thread(target=coin_gecko_stats).start()
+
+
+class SettingsMenu(tk.Frame):  # second page
+    def __init__(self, parent):
+        tk.Frame.__init__(self, parent)
+        self.configure(bg="#15151c")
+
+    def load_page(self):
+        def clear_page(event):
+            for child in self.winfo_children():
+                child.destroy()
+            app.show_frame(MainMenu)
+
+        app.bind("<Escape>", clear_page)
+
+        editor = tk.Text(self, bg="#1b1b24", fg="#838391", highlightbackground="#000000",
+                         height=6, font=("Consolas", 50))
+        editor.pack()
+        with open("settings.json", "r") as settings_file:
+            settings = json.load(settings_file)
+            for fav in settings["favourites"]:
+                editor.insert(tk.END, fav + "\n")
+
+        def save_settings():
+            modification = list(editor.get("1.0", "end-1c").splitlines())
+            settings["favourites"] = modification
+            with open("settings.json", "w") as settings_file2:
+                json.dump(settings, settings_file2)
+
+        save_button = tk.Button(self, command=lambda: save_settings(),
+                                text="Save", bg="#1b1b24", fg="#3ac7c2", highlightbackground="#000000")
+        save_button.pack()
 
 
 # launch application
