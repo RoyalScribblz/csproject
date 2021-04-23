@@ -39,7 +39,7 @@ class Application(tk.Tk):
         self.frames = {}
 
         # cycle through windows
-        for F in (Startup, MainMenu, CoinPage, SettingsMenu):
+        for F in (Startup, MainMenu, CoinPage, SettingsMenu, AIPage):
             frame = F(container)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
@@ -267,6 +267,14 @@ class CoinPage(tk.Frame):  # second page
             tk.Label(self, text="56m RSI: " + str(current_rsi3), font=stats_font, bg="#15151c", fg="#3ac7c2") \
                 .place(relx=0.73, rely=0.58)
 
+            def run_ai(dataframe):
+                AIPage.load_page(app.frames[AIPage], dataframe)
+                self.update_idletasks()  # make page transition less choppy
+                app.show_frame(AIPage)
+            tk.Button(self, text="Initiate AI", bg="#15151c", highlightthickness=0, bd=2, highlightbackground="#67676b",
+                      font=("Consolas", round(res_height / 34)), activebackground="#15151c", fg="#67676b",
+                      command=lambda: run_ai(df)).place(relx=0.78, rely=0.90)
+
         threading.Thread(target=draw_graph).start()
 
         def coin_gecko_stats():
@@ -292,12 +300,6 @@ class CoinPage(tk.Frame):  # second page
             ath = cg_data["market_data"]["ath"]["usd"]
             tk.Label(self, text="All-Time Hi: $" + "{:,.2f}".format(ath), font=stats_font, bg="#15151c",
                      fg="#3ac7c2").place(relx=0.73, rely=0.82)
-
-            daily_candles = get_klines(coin + "USDT", 1, "d", 100)
-            ml_result = lstm(daily_candles["Close"].astype(float).tolist(), 1)[0]
-            tk.Label(self, text="24hr AI: $" + str(round(ml_result, 8)), font=stats_font, bg="#15151c",
-                     fg="#3ac7c2").place(relx=0.73, rely=0.90)
-
         threading.Thread(target=coin_gecko_stats).start()
 
 
@@ -331,6 +333,36 @@ class SettingsMenu(tk.Frame):  # second page
         save_button = tk.Button(self, command=lambda: save_settings(),
                                 text="Save", bg="#1b1b24", fg="#3ac7c2", highlightbackground="#000000")
         save_button.pack()
+
+
+class AIPage(tk.Frame):  # second page
+    def __init__(self, parent):
+        tk.Frame.__init__(self, parent)
+        self.configure(bg="#15151c")
+
+    def load_page(self, df):
+        def clear_page(event):
+            for child in self.winfo_children():
+                child.destroy()
+            app.show_frame(MainMenu)
+
+        app.bind("<Escape>", clear_page)
+
+        def draw_graph():
+            figure = plt.Figure(figsize=(0.7 * res_width / 100, 0.65 * res_height / 100), facecolor="#67676b")
+            figure.add_subplot(fc="#15151c").plot(df["Close time"], df["Close"].astype(float), "-b")
+
+            # lstm
+            lstm_res = lstm(df["Close"].astype(float).tolist(), 50)
+            lstm_time = [df["Close time"].iloc[-1] + 60000]
+            for i in range(49):
+                lstm_time.append(lstm_time[-1] + 60000)
+            print(lstm_time)
+            print(lstm_res)
+            figure.add_subplot(fc="#15151c").plot(lstm_time, lstm_res, "-w")
+
+            FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.02, rely=0.2)
+        threading.Thread(target=draw_graph).start()
 
 
 # launch application
