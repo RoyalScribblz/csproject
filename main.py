@@ -150,7 +150,7 @@ class MainMenu(tk.Frame):  # main menu
         search.place(relx=0.35, rely=0.06, width=0.3 * res_width, height=0.1 * res_height)
 
         def initiate_search(event):
-            arg = search.get().strip().upper()
+            arg = search.get().replace(" ", "").upper()
             CoinPage.load_page(app.frames[CoinPage], arg)
             self.update_idletasks()  # make page transition less choppy
             app.show_frame(CoinPage)
