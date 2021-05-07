@@ -12,6 +12,11 @@ import json
 from coingecko_wrapper import get_cg
 import utilities as utils
 from lstm import lstm
+from tkinter import ttk
+import hashlib
+import sqlite3
+import uuid
+from tkinter import messagebox
 
 # current directory and platform (either linux or win32)
 cdir = os.getcwd()
@@ -39,7 +44,7 @@ class Application(tk.Tk):
         self.frames = {}
 
         # cycle through windows
-        for F in (Startup, MainMenu, CoinPage, SettingsMenu, AIPage):
+        for F in (Startup, LoginMenu, MainMenu, CoinPage, SettingsMenu, AIPage):
             frame = F(container)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
@@ -63,12 +68,54 @@ class Startup(tk.Frame):  # second page
             global res_height
             res_height = self.winfo_height()
 
-            MainMenu.load_page(app.frames[MainMenu])
+            LoginMenu.load_page(app.frames[LoginMenu])
             self.update_idletasks()  # make page transition less choppy
-            app.show_frame(MainMenu)
+            app.show_frame(LoginMenu)
 
         tk.Label(self, text="Loading", font=("Consolas", 120), bg="#15151c", fg="#3ac7c2").pack()
         tk.Button(self, text="Press to continue", font=("Consolas", 40), bg="#15151c", fg="#67676b",
+                  command=lambda: load_main()).pack()
+
+
+class LoginMenu(tk.Frame):  # login menu
+    def __init__(self, parent):
+        tk.Frame.__init__(self, parent)
+        self.configure(bg="#15151c")
+
+    def load_page(self):
+        def load_main():
+            username = usr.get()
+            password = hashlib.sha256(pwd.get().encode('utf-8')).hexdigest()
+            conn = sqlite3.connect("logins.db")
+            c = conn.cursor()
+            c.execute('SELECT * FROM logins')
+            data = c.fetchall()
+            conn.commit()
+            conn.close()
+            for row in data:
+                if row[1] == username and row[2] == password:
+                    print(f"Your ID: {row[0]}")
+                    MainMenu.load_page(app.frames[MainMenu])
+                    self.update_idletasks()  # make page transition less choppy
+                    app.show_frame(MainMenu)
+                    """with open("preferences.json", "r") as pref:
+                        profiles = json.load(pref)
+                        for profile in profiles:
+                            if profile["uuid"] == row[0]:
+                                print(f"Faves: {profile['faves']}")"""
+                    return True
+            messagebox.showerror(title="Invalid Login", message="The username or password you entered is incorrect.")
+            return False
+
+        usr = tk.Entry(self, font=("Consolas", round(res_height / 28)), bg="#15151c", fg="#3ac7c2",
+                       highlightbackground="#67676b")
+        usr.pack()
+
+        pwd = tk.Entry(self, font=("Consolas", round(res_height / 28)), bg="#15151c", fg="#3ac7c2",
+                       highlightbackground="#67676b")
+        pwd.pack()
+
+        tk.Button(self, text="Login", font=("Consolas", 40), bg="#15151c", fg="#67676b",
                   command=lambda: load_main()).pack()
 
 
@@ -271,6 +318,7 @@ class CoinPage(tk.Frame):  # second page
                 AIPage.load_page(app.frames[AIPage], dataframe)
                 self.update_idletasks()  # make page transition less choppy
                 app.show_frame(AIPage)
+
             tk.Button(self, text="Initiate AI", bg="#15151c", highlightthickness=0, bd=2, highlightbackground="#67676b",
                       font=("Consolas", round(res_height / 34)), activebackground="#15151c", fg="#67676b",
                       command=lambda: run_ai(df)).place(relx=0.78, rely=0.90)
@@ -300,6 +348,7 @@ class CoinPage(tk.Frame):  # second page
             ath = cg_data["market_data"]["ath"]["usd"]
             tk.Label(self, text="All-Time Hi: $" + "{:,.2f}".format(ath), font=stats_font, bg="#15151c",
                      fg="#3ac7c2").place(relx=0.73, rely=0.82)
+
         threading.Thread(target=coin_gecko_stats).start()
 
 
@@ -348,6 +397,10 @@ class AIPage(tk.Frame):  # second page
 
         app.bind("<Escape>", clear_page)
 
+        progress = ttk.Progressbar(self, orient=tk.HORIZONTAL, length=rel_width(0.3), mode="determinate", maximum=100)
+        progress.pack()
+        progress.step(10)
+
         def draw_graph():
             figure = plt.Figure(figsize=(0.7 * res_width / 100, 0.65 * res_height / 100), facecolor="#67676b")
             figure.add_subplot(fc="#15151c").plot(df["Close time"], df["Close"].astype(float), "-b")
@@ -355,13 +408,18 @@ class AIPage(tk.Frame):  # second page
             # lstm
             lstm_res = lstm(df["Close"].astype(float).tolist(), 50)
             lstm_time = [df["Close time"].iloc[-1] + 60000]
+            step = 0
             for i in range(49):
                 lstm_time.append(lstm_time[-1] + 60000)
+                step += 2
+                progress.step(step)
+                print(step)
             print(lstm_time)
             print(lstm_res)
             figure.add_subplot(fc="#15151c").plot(lstm_time, lstm_res, "-w")
 
             FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.02, rely=0.2)
+
         threading.Thread(target=draw_graph).start()
 
 
