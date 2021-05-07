@@ -109,14 +109,14 @@ class LoginMenu(tk.Frame):  # login menu
 
         usr = tk.Entry(self, font=("Consolas", round(res_height / 28)), bg="#15151c", fg="#3ac7c2",
                        highlightbackground="#67676b")
-        usr.pack()
+        usr.place(relx=0.35, rely=0.32, width=0.3 * res_width, height=0.1 * res_height)
 
         pwd = tk.Entry(self, font=("Consolas", round(res_height / 28)), bg="#15151c", fg="#3ac7c2",
                        highlightbackground="#67676b")
-        pwd.pack()
+        pwd.place(relx=0.35, rely=0.42, width=0.3 * res_width, height=0.1 * res_height)
 
         tk.Button(self, text="Login", font=("Consolas", 40), bg="#15151c", fg="#67676b",
-                  command=lambda: load_main()).pack()
+                  command=lambda: load_main()).place(relx=0.425, rely=0.52)
 
 
 class MainMenu(tk.Frame):  # main menu
