@@ -1,1 +1,24 @@
-{"favourites": ["BTC", "ETH", "XRP", "LTC", "LINK", "ADA"]}
+[
+    {
+        "uuid": "8659564a-af24-11eb-bab4-676ca80929f0",
+        "favourites": [
+            "BTC",
+            "ETH",
+            "XRP",
+            "LTC",
+            "LINK",
+            "BNT"
+        ]
+    },
+    {
+        "uuid": "14e2f942-b70f-11eb-a967-97f427a82ab1",
+        "favourites": [
+            "BTC",
+            "ETH",
+            "XRP",
+            "LTC",
+            "LINK",
+            "DOGE"
+        ]
+    }
+]

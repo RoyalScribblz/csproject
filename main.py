@@ -25,6 +25,7 @@ platform = sys.platform
 # variable updates on load
 res_width = 1310
 res_height = 704
+user_id = None
 
 
 def rel_width(multiplier): return round(multiplier * res_width)
@@ -44,7 +45,7 @@ class Application(tk.Tk):
         self.frames = {}
 
         # cycle through windows
-        for F in (Startup, LoginMenu, MainMenu, CoinPage, SettingsMenu, AIPage):
+        for F in (Startup, LoginMenu, MainMenu, CoinPage, SettingsMenu, AIPage, NewUser):
             frame = F(container)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
@@ -94,15 +95,12 @@ class LoginMenu(tk.Frame):  # login menu
             conn.close()
             for row in data:
                 if row[1] == username and row[2] == password:
-                    print(f"Your ID: {row[0]}")
+                    global user_id
+                    user_id = row[0]
+                    print("Login by: " + row[0])
                     MainMenu.load_page(app.frames[MainMenu])
                     self.update_idletasks()  # make page transition less choppy
                     app.show_frame(MainMenu)
-                    """with open("preferences.json", "r") as pref:
-                        profiles = json.load(pref)
-                        for profile in profiles:
-                            if profile["uuid"] == row[0]:
-                                print(f"Faves: {profile['faves']}")"""
                     return True
             messagebox.showerror(title="Invalid Login", message="The username or password you entered is incorrect.")
             return False
@@ -117,6 +115,46 @@ class LoginMenu(tk.Frame):  # login menu
 
         tk.Button(self, text="Login", font=("Consolas", 40), bg="#15151c", fg="#67676b",
                   command=lambda: load_main()).place(relx=0.425, rely=0.52)
+
+        # new user
+        tk.Button(self, text="Add User", font=("Consolas", 20), bg="#15151c", fg="#67676b",
+                  command=lambda: app.show_frame(NewUser)).place(relx=0.876, rely=0.925)
+
+
+class NewUser(tk.Frame):  # add user menu
+    def __init__(self, parent):
+        tk.Frame.__init__(self, parent)
+        self.configure(bg="#15151c")
+
+        tk.Label(self, text="New User", font=("Consolas", round(res_height / 34)), fg="#3ac7c2", bg="#15151c") \
+            .pack(pady=rel_height(0.15))
+
+        usr = tk.Entry(self, font=("Consolas", round(res_height / 28)), bg="#15151c", fg="#3ac7c2",
+                       highlightbackground="#67676b")
+        usr.place(relx=0.35, rely=0.32, width=0.3 * res_width, height=0.1 * res_height)
+
+        pwd = tk.Entry(self, font=("Consolas", round(res_height / 28)), bg="#15151c", fg="#3ac7c2",
+                       highlightbackground="#67676b")
+        pwd.place(relx=0.35, rely=0.42, width=0.3 * res_width, height=0.1 * res_height)
+
+        def create_user():
+            passwd = hashlib.sha256(pwd.get().encode('utf-8')).hexdigest()
+            conn = sqlite3.connect("logins.db")
+            c = conn.cursor()
+            new_uuid = str(uuid.uuid1())
+            c.execute("INSERT INTO logins VALUES (?, ?, ?)", (new_uuid, usr.get(), passwd))
+            c.execute('SELECT * FROM logins')
+            conn.commit()
+            conn.close()
+            app.show_frame(LoginMenu)
+
+            with open("settings.json", "rw") as settings_file:
+                settings = json.load(settings_file)
+                settings.append({"uuid": new_uuid, "favourites": ["BTC", "ETH", "XRP", "LTC", "LINK", "ADA"]})
+                json.dump(settings, settings_file, indent=4)
+
+        tk.Button(self, text="Create", font=("Consolas", 40), bg="#15151c", fg="#67676b",
+                  command=lambda: create_user()).place(relx=0.425, rely=0.52)
 
 
 class MainMenu(tk.Frame):  # main menu
@@ -148,8 +186,10 @@ class MainMenu(tk.Frame):  # main menu
             graphs_x = [0.05, 0.05, 0.05, 0.1 + (0.8 / 3), 0.1 + (0.8 / 3), 0.1 + (0.8 / 3)]
             graphs_y = [0.25, 0.5, 0.75, 0.25, 0.5, 0.75]  # how much to move each iteration
             with open("settings.json", "r") as settings_file:
-                faves = json.load(settings_file)["favourites"]
-                fav_coins = [[fav] for fav in faves]
+                profiles = json.load(settings_file)
+                for profile in profiles:
+                    if profile["uuid"] == user_id:
+                        fav_coins = [[fav] for fav in profile["favourites"]]
             for index in range(6):
 
                 df = get_klines(fav_coins[index][0] + "USDT", 1, "h", 24)
@@ -368,16 +408,25 @@ class SettingsMenu(tk.Frame):  # second page
         editor = tk.Text(self, bg="#1b1b24", fg="#838391", highlightbackground="#000000",
                          height=6, font=("Consolas", 50))
         editor.pack()
+
+        '''with open("settings.json", "r") as settings_file:
+            profiles = json.load(settings_file)
+            for profile in profiles:
+                if profile["uuid"] == user_id:
+                    fav_coins = [[fav] for fav in profile["favourites"]]'''
+
         with open("settings.json", "r") as settings_file:
-            settings = json.load(settings_file)
-            for fav in settings["favourites"]:
-                editor.insert(tk.END, fav + "\n")
+            profiles = json.load(settings_file)
+            for profile in profiles:
+                if profile["uuid"] == user_id:
+                    for fav in profile["favourites"]:
+                        editor.insert(tk.END, fav + "\n")
 
         def save_settings():
             modification = list(editor.get("1.0", "end-1c").splitlines())
-            settings["favourites"] = modification
+            profile["favourites"] = modification
             with open("settings.json", "w") as settings_file2:
-                json.dump(settings, settings_file2)
+                json.dump(profiles, settings_file2, indent=4)
 
         save_button = tk.Button(self, command=lambda: save_settings(),
                                 text="Save", bg="#1b1b24", fg="#3ac7c2", highlightbackground="#000000")
