@@ -2,7 +2,6 @@ import tkinter as tk
 from time import strftime
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import os
 import sys
 from PIL import ImageTk, Image
 from binance_wrapper import get_klines
@@ -18,11 +17,10 @@ import sqlite3
 import uuid
 from tkinter import messagebox
 
-# current directory and platform (either linux or win32)
-cdir = os.getcwd()
+# platform (either linux or win32) for platform specific functions
 platform = sys.platform
 
-# variable updates on load
+# variables updates on load
 res_width = 1310
 res_height = 704
 user_id = None
@@ -34,22 +32,24 @@ def rel_width(multiplier): return round(multiplier * res_width)
 def rel_height(multiplier): return round(multiplier * res_height)
 
 
-# app class
+# application class which manages the frame classes
 class Application(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
+
+        # create a container to put all the frames on
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
-        self.frames = {}
+        self.frames = {}  # dictionary of frames
 
-        # cycle through windows
+        # cycle through frames
         for F in (Startup, LoginMenu, MainMenu, CoinPage, SettingsMenu, AIPage, NewUser):
             frame = F(container)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
-        self.show_frame(Startup)
+        self.show_frame(Startup)  # lift the first frame to the top
 
     # method to change frames
     def show_frame(self, cont):
@@ -57,12 +57,13 @@ class Application(tk.Tk):
         frame.tkraise()
 
 
-class Startup(tk.Frame):  # second page
+class Startup(tk.Frame):  # startup page
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
 
-        self.configure(bg="#15151c")
+        self.configure(bg="#15151c")  # background colour
 
+        # set the resolution variables and load the login menu
         def load_main():
             global res_width
             res_width = self.winfo_width()
@@ -73,6 +74,7 @@ class Startup(tk.Frame):  # second page
             self.update_idletasks()  # make page transition less choppy
             app.show_frame(LoginMenu)
 
+        # widgets
         tk.Label(self, text="Loading", font=("Consolas", 120), bg="#15151c", fg="#3ac7c2").pack()
         tk.Button(self, text="Press to continue", font=("Consolas", 40), bg="#15151c", fg="#67676b",
                   command=lambda: load_main()).pack()
@@ -84,27 +86,29 @@ class LoginMenu(tk.Frame):  # login menu
         self.configure(bg="#15151c")
 
     def load_page(self):
+        # load the main menu with the entered user
         def load_main():
-            username = usr.get()
-            password = hashlib.sha256(pwd.get().encode('utf-8')).hexdigest()
-            conn = sqlite3.connect("logins.db")
+            username = usr.get()  # get the entered username
+            password = hashlib.sha256(pwd.get().encode('utf-8')).hexdigest()  # hash the entered password
+            conn = sqlite3.connect("logins.db")  # connect to the local database
             c = conn.cursor()
             c.execute('SELECT * FROM logins')
-            data = c.fetchall()
+            data = c.fetchall()  # retrieve all possible logins
             conn.commit()
             conn.close()
-            for row in data:
+            for row in data:  # loop through logins to compare the username and hash
                 if row[1] == username and row[2] == password:
                     global user_id
-                    user_id = row[0]
+                    user_id = row[0]  # set the user ID
                     print("Login by: " + row[0])
-                    MainMenu.load_page(app.frames[MainMenu])
+                    MainMenu.load_page(app.frames[MainMenu])  # load the main menu
                     self.update_idletasks()  # make page transition less choppy
                     app.show_frame(MainMenu)
-                    return True
+                    return True  # successful login
             messagebox.showerror(title="Invalid Login", message="The username or password you entered is incorrect.")
-            return False
+            return False  # unsuccessful login
 
+        # login entries
         usr = tk.Entry(self, font=("Consolas", round(res_height / 28)), bg="#15151c", fg="#3ac7c2",
                        highlightbackground="#67676b")
         usr.place(relx=0.35, rely=0.32, width=0.3 * res_width, height=0.1 * res_height)
@@ -121,11 +125,12 @@ class LoginMenu(tk.Frame):  # login menu
                   command=lambda: app.show_frame(NewUser)).place(relx=0.876, rely=0.925)
 
 
-class NewUser(tk.Frame):  # add user menu
+class NewUser(tk.Frame):  # user creation menu
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
         self.configure(bg="#15151c")
 
+        # data entries
         tk.Label(self, text="New User", font=("Consolas", round(res_height / 34)), fg="#3ac7c2", bg="#15151c") \
             .pack(pady=rel_height(0.15))
 
@@ -138,20 +143,20 @@ class NewUser(tk.Frame):  # add user menu
         pwd.place(relx=0.35, rely=0.42, width=0.3 * res_width, height=0.1 * res_height)
 
         def create_user():
-            passwd = hashlib.sha256(pwd.get().encode('utf-8')).hexdigest()
+            passwd = hashlib.sha256(pwd.get().encode('utf-8')).hexdigest()  # hash the password entry
             conn = sqlite3.connect("logins.db")
             c = conn.cursor()
             new_uuid = str(uuid.uuid1())
-            c.execute("INSERT INTO logins VALUES (?, ?, ?)", (new_uuid, usr.get(), passwd))
+            c.execute("INSERT INTO logins VALUES (?, ?, ?)", (new_uuid, usr.get(), passwd))  # write to the database
             c.execute('SELECT * FROM logins')
             conn.commit()
             conn.close()
-            app.show_frame(LoginMenu)
+            app.show_frame(LoginMenu)  # go back to the login menu
 
-            with open("settings.json", "rw") as settings_file:
+            with open("settings.json", "rw") as settings_file:  # create a default settings profile for the new user
                 settings = json.load(settings_file)
                 settings.append({"uuid": new_uuid, "favourites": ["BTC", "ETH", "XRP", "LTC", "LINK", "ADA"]})
-                json.dump(settings, settings_file, indent=4)
+                json.dump(settings, settings_file, indent=4)  # TODO this has no apparent effect?
 
         tk.Button(self, text="Create", font=("Consolas", 40), bg="#15151c", fg="#67676b",
                   command=lambda: create_user()).place(relx=0.425, rely=0.52)
@@ -160,7 +165,7 @@ class NewUser(tk.Frame):  # add user menu
 class MainMenu(tk.Frame):  # main menu
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
-        self.cog_image = None
+        self.cog_image = None  # make variable for image else it will be garbage collected
         self.configure(bg="#15151c")
 
     def load_page(self):
@@ -174,8 +179,8 @@ class MainMenu(tk.Frame):  # main menu
         clock.place(relx=0.8, rely=0.08)
 
         def tick():
-            clock.config(text=strftime("%H:%M:%S"))
-            clock.after(500, tick)
+            clock.config(text=strftime("%H:%M:%S"))  # set to current time
+            clock.after(500, tick)  # repeat every half second
 
         tick()
 
@@ -187,9 +192,9 @@ class MainMenu(tk.Frame):  # main menu
             graphs_y = [0.25, 0.5, 0.75, 0.25, 0.5, 0.75]  # how much to move each iteration
             with open("settings.json", "r") as settings_file:
                 profiles = json.load(settings_file)
-                for profile in profiles:
+                for profile in profiles:  # search profiles for the current users preferences
                     if profile["uuid"] == user_id:
-                        fav_coins = [[fav] for fav in profile["favourites"]]
+                        fav_coins = [[fav] for fav in profile["favourites"]]  # nested array for values
             for index in range(6):
 
                 df = get_klines(fav_coins[index][0] + "USDT", 1, "h", 24)
@@ -244,7 +249,7 @@ class MainMenu(tk.Frame):  # main menu
 
         search.bind("<Return>", initiate_search)
 
-        # grid on right
+        # grid on right hand side
         canvas.create_rectangle(round((0.15 + ((0.8 / 3) * 2)) * res_width), round(0.25 * res_height),
                                 round((0.15 + ((0.8 / 3) * 3)) * res_width), round(0.95 * res_height),
                                 width=5, outline="#67676b")
@@ -474,4 +479,5 @@ if platform == "linux":  # change zoom method depending on platform
 else:
     app.state("zoomed")
 app.configure(bg="black")
+app.iconbitmap("images/icon.ico")
 app.mainloop()
