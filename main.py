@@ -409,12 +409,6 @@ class SettingsMenu(tk.Frame):  # second page
                          height=6, font=("Consolas", 50))
         editor.pack()
 
-        '''with open("settings.json", "r") as settings_file:
-            profiles = json.load(settings_file)
-            for profile in profiles:
-                if profile["uuid"] == user_id:
-                    fav_coins = [[fav] for fav in profile["favourites"]]'''
-
         with open("settings.json", "r") as settings_file:
             profiles = json.load(settings_file)
             for profile in profiles:
@@ -428,7 +422,7 @@ class SettingsMenu(tk.Frame):  # second page
             with open("settings.json", "w") as settings_file2:
                 json.dump(profiles, settings_file2, indent=4)
 
-        save_button = tk.Button(self, command=lambda: save_settings(),
+        save_button = tk.Button(self, command=lambda: save_settings(), font=("Consolas", round(res_height / 48)),
                                 text="Save", bg="#1b1b24", fg="#3ac7c2", highlightbackground="#000000")
         save_button.pack()
 
@@ -455,10 +449,10 @@ class AIPage(tk.Frame):  # second page
             figure.add_subplot(fc="#15151c").plot(df["Close time"], df["Close"].astype(float), "-b")
 
             # lstm
-            lstm_res = lstm(df["Close"].astype(float).tolist(), 50)
+            lstm_res = lstm(df["Close"].astype(float).tolist(), 100)
             lstm_time = [df["Close time"].iloc[-1] + 60000]
             step = 0
-            for i in range(49):
+            for i in range(99):
                 lstm_time.append(lstm_time[-1] + 60000)
                 step += 2
                 progress.step(step)
