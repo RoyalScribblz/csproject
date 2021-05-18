@@ -195,8 +195,8 @@ class MainMenu(tk.Frame):  # main menu
                 for profile in profiles:  # search profiles for the current users preferences
                     if profile["uuid"] == user_id:
                         fav_coins = [[fav] for fav in profile["favourites"]]  # nested array for values
-            for index in range(6):
 
+            for index in range(6):
                 df = get_klines(fav_coins[index][0] + "USDT", 1, "h", 24)
                 figure = plt.Figure(figsize=((0.8 / 3) * res_width / 100, 0.2 * res_height / 100), facecolor="#67676b")
                 start_price = float(df["Close"][0])
