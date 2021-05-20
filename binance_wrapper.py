@@ -1,12 +1,12 @@
 import requests
 import pandas as pd
 
-millis_time = {"m": 60000, "h": 3600000, "d": 86400000, "w": 604800000, "M": 2592000000}
+millis_time = {"m": 60000, "h": 3600000, "d": 86400000, "w": 604800000, "M": 2592000000}  # symbols for time intervals
 
 
-def is_code(response):
+def is_code(response):  # error catching to prevent overloading the API
     if type(response) is dict:
-        print("[Binance] Error " + str(response["code"]) + ", " + response["msg"])
+        print("[Binance] Error " + str(response["code"]) + ", " + response["msg"])  # output the error
         return True
     return False
 
@@ -16,7 +16,7 @@ def get_klines(symbol, interval_num, interval_letter, limit):
     if not interval.endswith(("m", "h", "d", "w", "M")):  # require interval format
         raise Exception("Kline interval must be m, h, d, w, or M")
 
-    millis_interval = interval_num * millis_time[interval_letter]
+    millis_interval = interval_num * millis_time[interval_letter]  # convert to correct time format
 
     remainder = limit % 1000 if limit % 1000 != 0 else 1000  # make sure the request gets data
 

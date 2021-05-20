@@ -197,14 +197,14 @@ class MainMenu(tk.Frame):  # main menu
                         fav_coins = [[fav] for fav in profile["favourites"]]  # nested array for values
 
             for index in range(6):
-                df = get_klines(fav_coins[index][0] + "USDT", 1, "h", 24)
+                df = get_klines(fav_coins[index][0] + "USDT", 1, "h", 24)  # retrieve the candlestick data
                 figure = plt.Figure(figsize=((0.8 / 3) * res_width / 100, 0.2 * res_height / 100), facecolor="#67676b")
                 start_price = float(df["Close"][0])
                 end_price = float(df["Close"][23])
                 if end_price > start_price:
-                    colour = "g"
+                    colour = "g"  # green if positive change
                 else:
-                    colour = "r"
+                    colour = "r"  # red otherwise
                 figure.add_subplot(fc="#15151c").plot(df["Close time"], df["Close"].astype(float), "-" + colour)
                 FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=graphs_x[index], rely=graphs_y[index])
 
@@ -213,11 +213,11 @@ class MainMenu(tk.Frame):  # main menu
                 fav_coins[index].append(str(round(change, 2)))
 
             # coin list on right
-            fav_coins.sort(key=lambda x: float(x[1]), reverse=True)
+            fav_coins.sort(key=lambda x: float(x[1]), reverse=True)  # sort by percentage change
             y = 0.38
             for change in fav_coins:
                 if float(change[1]) > 0:
-                    symbol = "+"
+                    symbol = "+"  # add symbol if positive
                 else:
                     symbol = ""
                 name = change[0]  # for equal spacing
@@ -227,27 +227,27 @@ class MainMenu(tk.Frame):  # main menu
                     .place(relx=(0.165 + ((0.8 / 3) * 2)), rely=y)
                 y += 0.09
 
-        threading.Thread(target=graph_drawing).start()
+        threading.Thread(target=graph_drawing).start()  # start in new thread to prevent app freeze
 
         # search bar
         search = tk.Entry(self, font=("Consolas", round(res_height / 28)), bg="#15151c", fg="#3ac7c2",
                           highlightbackground="#67676b")
         search.insert(0, " Search")
 
-        def clear_search(event):
+        def clear_search(event):  # clear the search bar when left click
             search.insert(0, " ")
             search.delete(1, tk.END)
 
         search.bind("<Button-1>", clear_search)
         search.place(relx=0.35, rely=0.06, width=0.3 * res_width, height=0.1 * res_height)
 
-        def initiate_search(event):
+        def initiate_search(event):  # load the coin page with the entered coin
             arg = search.get().replace(" ", "").upper()
             CoinPage.load_page(app.frames[CoinPage], arg)
             self.update_idletasks()  # make page transition less choppy
             app.show_frame(CoinPage)
 
-        search.bind("<Return>", initiate_search)
+        search.bind("<Return>", initiate_search)  # search when enter is pressed
 
         # grid on right hand side
         canvas.create_rectangle(round((0.15 + ((0.8 / 3) * 2)) * res_width), round(0.25 * res_height),
@@ -279,12 +279,12 @@ class CoinPage(tk.Frame):  # second page
     def load_page(self, coin):
         self.configure(bg="#15151c")
 
-        def clear_page(event):
+        def clear_page(event):  # wipe the page
             for child in self.winfo_children():
-                child.destroy()
+                child.destroy()  # destroy all widgets
             app.show_frame(MainMenu)
 
-        app.bind("<Escape>", clear_page)
+        app.bind("<Escape>", clear_page)  # return to main menu with escape key
 
         tk.Label(self, text=coin + " / USDT", font=("Consolas", round(res_height / 48)), fg="#67676b", bg="#15151c") \
             .pack(pady=rel_height(0.01))
@@ -292,8 +292,9 @@ class CoinPage(tk.Frame):  # second page
         stats_font = ("Consolas", round(res_height / 34))
 
         def draw_graph():
-            df = get_klines(coin + "USDT", 1, "m", 1440)
+            df = get_klines(coin + "USDT", 1, "m", 1440)  # retrieve the past 24 hrs in 1 minute intervals
 
+            # same as main menu
             figure = plt.Figure(figsize=(0.7 * res_width / 100, 0.65 * res_height / 100), facecolor="#67676b")
             start_price = float(df["Close"][0])
             end_price = float(df["Close"][1439])
@@ -309,16 +310,16 @@ class CoinPage(tk.Frame):  # second page
 
             FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.02, rely=0.2)
 
-            # relative strength index
+            # relative strength index 1
             rsi_df1 = indicators.rsi(df, 14)
             figure = plt.Figure(figsize=(0.7 * res_width / 100, 0.2 * res_height / 100), facecolor="#67676b")
             figure.add_subplot(fc="#15151c").plot(df["Close time"], rsi_df1.tolist(), "-b")
 
-            # relative strength index
+            # relative strength index 2
             rsi_df2 = indicators.rsi(df, 28)
             figure.add_subplot(fc="#15151c").plot(df["Close time"], rsi_df2.tolist(), "-m")
 
-            # relative strength index
+            # relative strength index 3
             rsi_df3 = indicators.rsi(df, 56)
             figure.add_subplot(fc="#15151c").plot(df["Close time"], rsi_df3.tolist(), "-y")
 
@@ -331,35 +332,42 @@ class CoinPage(tk.Frame):  # second page
 
             # right hand side stats
 
+            # current price
             tk.Label(self, text="Price Now: $" + "{:,.2f}".format(end_price), font=stats_font,
                      bg="#15151c", fg="#3ac7c2").place(relx=0.73, rely=0.1)
 
+            # 24 hour high
             day_high = round(float(df["Close"].max()), 2)
             tk.Label(self, text="24hr High: $" + "{:,.2f}".format(day_high), font=stats_font,
                      bg="#15151c", fg="#3ac7c2").place(relx=0.73, rely=0.18)
 
+            # 24 hour low
             day_low = round(float(df["Close"].min()), 2)
             tk.Label(self, text="24hr Low: $" + "{:,.2f}".format(day_low), font=stats_font,
                      bg="#15151c", fg="#3ac7c2").place(relx=0.73, rely=0.26)
 
+            # 24 hour percentage change
             per_change = round(((end_price - start_price) / start_price) * 100, 2)
             per_change = "+" + str(per_change) if per_change > 0 else "" + str(per_change)
             tk.Label(self, text="24hr Change: " + per_change + "%", font=stats_font, bg="#15151c", fg="#3ac7c2") \
                 .place(relx=0.73, rely=0.34)
 
+            # relative strength index 1
             current_rsi1 = round(rsi_df1.iloc[-1], 4)
             tk.Label(self, text="14m RSI: " + str(current_rsi1), font=stats_font, bg="#15151c", fg="#3ac7c2") \
                 .place(relx=0.73, rely=0.42)
 
+            # relative strength index 2
             current_rsi2 = round(rsi_df2.iloc[-1], 4)
             tk.Label(self, text="28m RSI: " + str(current_rsi2), font=stats_font, bg="#15151c", fg="#3ac7c2") \
                 .place(relx=0.73, rely=0.50)
 
+            # relative strength index 3
             current_rsi3 = round(rsi_df3.iloc[-1], 4)
             tk.Label(self, text="56m RSI: " + str(current_rsi3), font=stats_font, bg="#15151c", fg="#3ac7c2") \
                 .place(relx=0.73, rely=0.58)
 
-            def run_ai(dataframe):
+            def run_ai(dataframe):  # execute ai separately so not demanding on hardware when unwanted
                 AIPage.load_page(app.frames[AIPage], dataframe)
                 self.update_idletasks()  # make page transition less choppy
                 app.show_frame(AIPage)
@@ -368,33 +376,36 @@ class CoinPage(tk.Frame):  # second page
                       font=("Consolas", round(res_height / 34)), activebackground="#15151c", fg="#67676b",
                       command=lambda: run_ai(df)).place(relx=0.78, rely=0.90)
 
-        threading.Thread(target=draw_graph).start()
+        threading.Thread(target=draw_graph).start()  # run on new thread
 
-        def coin_gecko_stats():
+        def coin_gecko_stats():  # stats from CoinGecko.com
             cg_id = None
             with open("cg_coins.json", "r") as cg_file:
                 cg_ids = json.load(cg_file)
                 for item in cg_ids:
                     if item["symbol"].upper() == coin:
-                        cg_id = item["id"]
+                        cg_id = item["id"]  # retrieve the CoinGecko id from cg_coins.json with the symbol
 
             if cg_id is None:
-                return
+                return  # exit if no coin is found (results in empty page instead of crash)
             cg_data = get_cg(cg_id)
 
+            # market cap
             market_cap = cg_data["market_data"]["market_cap"]["usd"]
             tk.Label(self, text="Market Cap: $" + utils.number_suffix(market_cap), font=stats_font,
                      bg="#15151c", fg="#3ac7c2").place(relx=0.73, rely=0.66)
 
+            # 24hr trade volume
             volume = cg_data["market_data"]["total_volume"]["usd"]
             tk.Label(self, text="Trade Volume: $" + utils.number_suffix(volume), font=stats_font, bg="#15151c",
                      fg="#3ac7c2").place(relx=0.73, rely=0.74)
 
+            # all time high
             ath = cg_data["market_data"]["ath"]["usd"]
             tk.Label(self, text="All-Time Hi: $" + "{:,.2f}".format(ath), font=stats_font, bg="#15151c",
                      fg="#3ac7c2").place(relx=0.73, rely=0.82)
 
-        threading.Thread(target=coin_gecko_stats).start()
+        threading.Thread(target=coin_gecko_stats).start()  # start on new thread
 
 
 class SettingsMenu(tk.Frame):  # second page
@@ -403,9 +414,9 @@ class SettingsMenu(tk.Frame):  # second page
         self.configure(bg="#15151c")
 
     def load_page(self):
-        def clear_page(event):
+        def clear_page(event):  # wipe the page
             for child in self.winfo_children():
-                child.destroy()
+                child.destroy()  # destroy all widgets
             app.show_frame(MainMenu)
 
         app.bind("<Escape>", clear_page)
@@ -417,14 +428,15 @@ class SettingsMenu(tk.Frame):  # second page
         with open("settings.json", "r") as settings_file:
             profiles = json.load(settings_file)
             for profile in profiles:
-                if profile["uuid"] == user_id:
+                if profile["uuid"] == user_id:  # identify the user by their ID
                     for fav in profile["favourites"]:
-                        editor.insert(tk.END, fav + "\n")
+                        editor.insert(tk.END, fav + "\n")  # load the preferences and each coin on a new line
 
+        # save button and function
         def save_settings():
-            modification = list(editor.get("1.0", "end-1c").splitlines())
+            modification = list(editor.get("1.0", "end-1c").splitlines())  # add values to a list
             profile["favourites"] = modification
-            with open("settings.json", "w") as settings_file2:
+            with open("settings.json", "w") as settings_file2:  # write the profile back to the settings file
                 json.dump(profiles, settings_file2, indent=4)
 
         save_button = tk.Button(self, command=lambda: save_settings(), font=("Consolas", round(res_height / 48)),
@@ -432,24 +444,25 @@ class SettingsMenu(tk.Frame):  # second page
         save_button.pack()
 
 
-class AIPage(tk.Frame):  # second page
+class AIPage(tk.Frame):  # machine learning page
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
         self.configure(bg="#15151c")
 
     def load_page(self, df):
-        def clear_page(event):
+        def clear_page(event):  # wipe the page
             for child in self.winfo_children():
-                child.destroy()
+                child.destroy()  # destroy all widgets
             app.show_frame(MainMenu)
 
         app.bind("<Escape>", clear_page)
 
+        # TODO extraordinarily broken progress bar - doesn't increase bit by bit due to thread
         progress = ttk.Progressbar(self, orient=tk.HORIZONTAL, length=rel_width(0.3), mode="determinate", maximum=100)
         progress.pack()
-        progress.step(10)
+        progress.step(20)
 
-        def draw_graph():
+        def draw_graph():  # standard graph drawing method with additional data
             figure = plt.Figure(figsize=(0.7 * res_width / 100, 0.65 * res_height / 100), facecolor="#67676b")
             figure.add_subplot(fc="#15151c").plot(df["Close time"], df["Close"].astype(float), "-b")
 
@@ -461,14 +474,11 @@ class AIPage(tk.Frame):  # second page
                 lstm_time.append(lstm_time[-1] + 60000)
                 step += 2
                 progress.step(step)
-                print(step)
-            print(lstm_time)
-            print(lstm_res)
-            figure.add_subplot(fc="#15151c").plot(lstm_time, lstm_res, "-w")
+            figure.add_subplot(fc="#15151c").plot(lstm_time, lstm_res, "-w")  # add the machine learnt data on top
 
             FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.02, rely=0.2)
 
-        threading.Thread(target=draw_graph).start()
+        threading.Thread(target=draw_graph).start()  # start in a new thread
 
 
 # launch application

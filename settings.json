@@ -11,6 +11,39 @@
         ]
     },
     {
+        "uuid": "b9a816f0-b184-11eb-9495-ad8644fb1e6a",
+        "favourites": [
+            "BTC",
+            "ETH",
+            "XRP",
+            "LTC",
+            "LINK",
+            "BNT"
+        ]
+    },
+    {
+        "uuid": "90e39fd8-b188-11eb-9495-ad8644fb1e6a",
+        "favourites": [
+            "BTC",
+            "ETH",
+            "XRP",
+            "LTC",
+            "LINK",
+            "BNT"
+        ]
+    },
+    {
+        "uuid": "5844cd0d-b7d7-11eb-9257-001a7dda7111",
+        "favourites": [
+            "BTC",
+            "ETH",
+            "XRP",
+            "LTC",
+            "LINK",
+            "BNT"
+        ]
+    },
+    {
         "uuid": "14e2f942-b70f-11eb-a967-97f427a82ab1",
         "favourites": [
             "BTC",
