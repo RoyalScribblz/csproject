@@ -23,29 +23,30 @@ def get_klines(symbol, interval_num, interval_letter, limit):
     responses = []
 
     response = requests.get("https://api.binance.com/api/v3/klines?symbol=" + symbol.upper() + "&interval="
-                            + interval + "&limit=" + str(remainder)).json()
+                            + interval + "&limit=" + str(remainder)).json()  # send a web request
 
     if is_code(response):
-        return None
+        return None  # exit function if there is an error code
 
     responses.extend(response)
     limit -= remainder
 
     open_time = response[0][0]
 
-    while limit > 0:
+    while limit > 0:  # loop until limit has been met, intervals of 1000 because of max limit
         open_time -= millis_interval * 1000
 
         response = requests.get("https://api.binance.com/api/v3/klines?symbol=" + symbol.upper() + "&interval="
-                                + interval + "&limit=1000&startTime=" + str(open_time)).json()
+                                + interval + "&limit=1000&startTime=" + str(open_time)).json()  # make the next request
 
         if is_code(response):
-            break
+            break  # don't continue if there is an error code
 
         responses.extend(response)
 
         limit -= 1000
 
+    # create a dataframe with all responses
     df = pd.DataFrame(sorted(responses, key=lambda x: float(x[0])),
                       columns=["Open time", "Open", "High", "Low", "Close", "Volume",
                                "Close time", "Quote asset volume", "Number of trades",

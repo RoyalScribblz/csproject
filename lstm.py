@@ -12,7 +12,7 @@ def noisy(num):
         multiplier = 1 + factor
     else:
         multiplier = 1 - factor
-    return num * multiplier
+    return num * multiplier  # multiply to add noise
 
 
 def lstm(data, n=3):
