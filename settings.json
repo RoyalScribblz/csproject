@@ -53,5 +53,16 @@
             "LINK",
             "DOGE"
         ]
+    },
+    {
+        "uuid": "e8e64c6a-bd54-11eb-9740-001a7dda7111",
+        "favourites": [
+            "BTC",
+            "ETH",
+            "XRP",
+            "LTC",
+            "LINK",
+            "ADA"
+        ]
     }
 ]

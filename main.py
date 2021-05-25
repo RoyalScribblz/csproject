@@ -117,8 +117,8 @@ class LoginMenu(tk.Frame):  # login menu
                        highlightbackground="#67676b")
         pwd.place(relx=0.35, rely=0.42, width=0.3 * res_width, height=0.1 * res_height)
 
-        tk.Button(self, text="Login", font=("Consolas", 40), bg="#15151c", fg="#67676b",
-                  command=lambda: load_main()).place(relx=0.425, rely=0.52)
+        tk.Button(self, text="Login", font=("Consolas", round(res_height / 28)), bg="#15151c", fg="#67676b",
+                  command=lambda: load_main()).place(relx=0.45, rely=0.52)
 
         # new user
         tk.Button(self, text="Add User", font=("Consolas", 20), bg="#15151c", fg="#67676b",
@@ -131,16 +131,16 @@ class NewUser(tk.Frame):  # user creation menu
         self.configure(bg="#15151c")
 
         # data entries
-        tk.Label(self, text="New User", font=("Consolas", round(res_height / 34)), fg="#3ac7c2", bg="#15151c") \
-            .pack(pady=rel_height(0.15))
+        tk.Label(self, text="New User", font=("Consolas", round(res_height / 20)), fg="#3ac7c2", bg="#15151c") \
+            .pack(pady=(rel_height(0.45), 0))
 
-        usr = tk.Entry(self, font=("Consolas", round(res_height / 28)), bg="#15151c", fg="#3ac7c2",
+        usr = tk.Entry(self, font=("Consolas", round(res_height / 20)), bg="#15151c", fg="#3ac7c2",
                        highlightbackground="#67676b")
-        usr.place(relx=0.35, rely=0.32, width=0.3 * res_width, height=0.1 * res_height)
+        usr.pack(pady=(rel_height(0.1), 0))
 
-        pwd = tk.Entry(self, font=("Consolas", round(res_height / 28)), bg="#15151c", fg="#3ac7c2",
+        pwd = tk.Entry(self, font=("Consolas", round(res_height / 20)), bg="#15151c", fg="#3ac7c2",
                        highlightbackground="#67676b")
-        pwd.place(relx=0.35, rely=0.42, width=0.3 * res_width, height=0.1 * res_height)
+        pwd.pack(pady=(2, 0))
 
         def create_user():
             passwd = hashlib.sha256(pwd.get().encode('utf-8')).hexdigest()  # hash the password entry
@@ -153,13 +153,14 @@ class NewUser(tk.Frame):  # user creation menu
             conn.close()
             app.show_frame(LoginMenu)  # go back to the login menu
 
-            with open("settings.json", "rw") as settings_file:  # create a default settings profile for the new user
-                settings = json.load(settings_file)
-                settings.append({"uuid": new_uuid, "favourites": ["BTC", "ETH", "XRP", "LTC", "LINK", "ADA"]})
-                json.dump(settings, settings_file, indent=4)  # TODO this has no apparent effect?
+            with open("settings.json", "r") as settings_file:  # create a default settings profile for the new user
+                settings = json.load(settings_file)  # get settings
+                settings.append({"uuid": new_uuid, "favourites": ["BTC", "ETH", "XRP", "LTC", "LINK", "ADA"]})  # add
+            with open("settings.json", "w") as settings_file:
+                json.dump(settings, settings_file, indent=4)  # write new settings
 
-        tk.Button(self, text="Create", font=("Consolas", 40), bg="#15151c", fg="#67676b",
-                  command=lambda: create_user()).place(relx=0.425, rely=0.52)
+        tk.Button(self, text="Create", font=("Consolas", round(res_height / 20)), bg="#15151c", fg="#67676b",
+                  command=lambda: create_user()).pack(pady=(rel_height(0.1), 0))
 
 
 class MainMenu(tk.Frame):  # main menu
@@ -460,7 +461,6 @@ class AIPage(tk.Frame):  # machine learning page
         # TODO extraordinarily broken progress bar - doesn't increase bit by bit due to thread
         progress = ttk.Progressbar(self, orient=tk.HORIZONTAL, length=rel_width(0.3), mode="determinate", maximum=100)
         progress.pack()
-        progress.step(20)
 
         def draw_graph():  # standard graph drawing method with additional data
             figure = plt.Figure(figsize=(0.7 * res_width / 100, 0.65 * res_height / 100), facecolor="#67676b")
@@ -469,11 +469,12 @@ class AIPage(tk.Frame):  # machine learning page
             # lstm
             lstm_res = lstm(df["Close"].astype(float).tolist(), 100)
             lstm_time = [df["Close time"].iloc[-1] + 60000]
-            step = 0
+            step = 1
             for i in range(99):
                 lstm_time.append(lstm_time[-1] + 60000)
-                step += 2
-                progress.step(step)
+                step += 1
+                progress['value'] = step
+                app.update_idletasks()
             figure.add_subplot(fc="#15151c").plot(lstm_time, lstm_res, "-w")  # add the machine learnt data on top
 
             FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.02, rely=0.2)
