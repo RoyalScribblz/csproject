@@ -487,8 +487,8 @@ app = Application()
 app.title("Crypto App")
 if platform == "linux":  # change zoom method depending on platform
     app.wm_attributes("-zoomed", 1)
-else:
+else:  # windows
     app.state("zoomed")
+    app.iconbitmap("images/icon.ico")
 app.configure(bg="black")
-app.iconbitmap("images/icon.ico")
 app.mainloop()
