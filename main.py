@@ -249,7 +249,7 @@ class MainMenu(tk.Frame):  # main menu
                 figure.tight_layout()
                 figure.subplots_adjust(left=0.11)
 
-                ax.plot([i*-1 for i in range(0, 24)][::-1], df["Close"].astype(float), "-" + colour)  # over -24hr
+                ax.plot([i * -1 for i in range(0, 24)][::-1], df["Close"].astype(float), "-" + colour)  # over -24hr
                 FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=graphs_x[index], rely=graphs_y[index])
 
                 tk.Label(self, text=str(fav_coins[index][0]).upper(), font=font_80, bg=BOX_COLOUR, fg=ACCENT_COLOUR) \
@@ -338,7 +338,7 @@ class CoinPage(tk.Frame):  # second page
 
         def draw_graph():
             df = get_klines(coin + "USDT", 1, "m", 1440)  # retrieve the past 24 hrs in 1 minute intervals
-            reverse_time = [i*-1 for i in range(0, 1440)][::-1]
+            reverse_time = [i * -1 for i in range(0, 1440)][::-1]
 
             # volume graph first (for overlap)
             figure = plt.Figure(figsize=(0.7 * res_width / 100, 0.2 * res_height / 100), facecolor=DARK_GREY)
@@ -551,8 +551,25 @@ class AIPage(tk.Frame):  # machine learning page
         # TODO extraordinarily broken progress bar - doesn't increase bit by bit due to thread
 
         def draw_graph():  # standard graph drawing method with additional data
-            figure = plt.Figure(figsize=(1.0 * res_width / 100, 1.0 * res_height / 100), facecolor=LIGHT_GREY)
-            figure.add_subplot(fc=DARK_GREY).plot(df["Close time"], df["Close"].astype(float), "-b")
+            figure = plt.Figure(figsize=(1.0 * res_width / 100, 1.0 * res_height / 100), facecolor=DARK_GREY)
+
+            # styling
+            ax = figure.add_subplot(111, fc=DARK_GREY)
+            ax.set_xlabel("Time (minutes)", fontsize=round(res_height / 80))
+            ax.set_ylabel("RSI (%)", fontsize=round(res_height / 80))
+            ax.xaxis.label.set_color(LIGHT_GREY)
+            ax.yaxis.label.set_color(LIGHT_GREY)
+            for axis in ["bottom", "left"]:  # modify borders
+                ax.spines[axis].set_color(LIGHT_GREY)
+                ax.spines[axis].set_linewidth(3)
+            for axis in ["top", "right"]:  # remove borders
+                ax.spines[axis].set_linewidth(0)
+            for axis in ["x", "y"]:
+                ax.tick_params(axis=axis, colors=LIGHT_GREY, which="both", width=2)
+            figure.subplots_adjust(left=0.1, right=1.0, bottom=0.15, top=1.0)
+            figure.tight_layout()
+
+            ax.plot(df["Close time"], df["Close"].astype(float), "-b")
 
             # loading text covered by graph
             tk.Label(self, text="Loading, please wait...", font=LARGE_FONT, bg=DARK_GREY, fg=ACCENT_COLOUR) \
@@ -564,7 +581,7 @@ class AIPage(tk.Frame):  # machine learning page
             for i in range(99):
                 lstm_time.append(lstm_time[-1] + 60000)
                 app.update_idletasks()
-            figure.add_subplot(fc=DARK_GREY).plot(lstm_time, lstm_res, "-w")  # add the machine learnt data on top
+            ax.plot(lstm_time, lstm_res, "-w")  # add the machine learnt data on top
 
             FigureCanvasTkAgg(figure, self).get_tk_widget().place(x=0, y=0)
 
