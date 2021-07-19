@@ -4,14 +4,13 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import sys
 from PIL import ImageTk, Image
-from binance_wrapper import get_klines
+from utilities.binance_wrapper import get_klines
 import threading
-import indicators
+import utilities.indicators as indicators
 import json
-from coingecko_wrapper import get_cg
+from utilities.coingecko_wrapper import get_cg
 import utilities as utils
-from lstm import lstm
-from tkinter import ttk
+from utilities.lstm import lstm
 import hashlib
 import sqlite3
 import uuid
@@ -73,123 +72,12 @@ class Application(tk.Tk):
         frame.tkraise()
 
 
-class Startup(tk.Frame):  # startup page
-    def __init__(self, parent):
-        tk.Frame.__init__(self, parent)
-
-        self.configure(bg=DARK_GREY)  # background colour
-
-        # set the resolution variables and load the login menu
-        def load_main():
-            global res_width
-            res_width = self.winfo_width()
-            global res_height
-            res_height = self.winfo_height()
-
-            global font_28
-            font_28 = ("Consolas", round(res_height / 28))
-            global font_20
-            font_20 = ("Consolas", round(res_height / 20))
-            global font_25
-            font_25 = ("Consolas", round(res_height / 25))
-            global font_48
-            font_48 = ("Consolas", round(res_height / 48))
-            global font_34
-            font_34 = ("Consolas", round(res_height / 34))
-            global font_80
-            font_80 = ("Consolas", round(res_height / 80))
-
-            LoginMenu.load_page(app.frames[LoginMenu])
-            self.update_idletasks()  # make page transition less choppy
-            app.show_frame(LoginMenu)
-
-        # widgets
-        tk.Label(self, text="Loading", font=LARGE_FONT, bg=DARK_GREY, fg=ACCENT_COLOUR).pack()
-        tk.Button(self, text="Press to continue", font=SMALL_FONT, bg=DARK_GREY, fg=LIGHT_GREY,
-                  command=lambda: load_main()).pack()
 
 
-class LoginMenu(tk.Frame):  # login menu
-    def __init__(self, parent):
-        tk.Frame.__init__(self, parent)
-        self.configure(bg=DARK_GREY)
-
-    def load_page(self):
-        # load the main menu with the entered user
-        def load_main():
-            username = usr.get()  # get the entered username
-            password = hashlib.sha256(pwd.get().encode('utf-8')).hexdigest()  # hash the entered password
-            conn = sqlite3.connect("logins.db")  # connect to the local database
-            c = conn.cursor()
-            c.execute('SELECT * FROM logins')
-            data = c.fetchall()  # retrieve all possible logins
-            conn.commit()
-            conn.close()
-            for row in data:  # loop through logins to compare the username and hash
-                if row[1] == username and row[2] == password:
-                    global user_id
-                    user_id = row[0]  # set the user ID
-                    print("Login by: " + row[0])
-                    MainMenu.load_page(app.frames[MainMenu])  # load the main menu
-                    self.update_idletasks()  # make page transition less choppy
-                    app.show_frame(MainMenu)
-                    return True  # successful login
-            messagebox.showerror(title="Invalid Login", message="The username or password you entered is incorrect.")
-            return False  # unsuccessful login
-
-        # login entries
-        usr = tk.Entry(self, font=font_28, bg=DARK_GREY, fg=ACCENT_COLOUR,
-                       highlightbackground=LIGHT_GREY)
-        usr.place(relx=0.35, rely=0.32, width=0.3 * res_width, height=0.1 * res_height)
-
-        pwd = tk.Entry(self, font=font_28, bg=DARK_GREY, fg=ACCENT_COLOUR,
-                       highlightbackground=LIGHT_GREY)
-        pwd.place(relx=0.35, rely=0.42, width=0.3 * res_width, height=0.1 * res_height)
-
-        tk.Button(self, text="Login", font=font_28, bg=DARK_GREY, fg=LIGHT_GREY,
-                  command=lambda: load_main()).place(relx=0.45, rely=0.52)
-
-        # new user
-        tk.Button(self, text="Add User", font=SMALL_FONT, bg=DARK_GREY, fg=LIGHT_GREY,
-                  command=lambda: app.show_frame(NewUser)).place(relx=0.876, rely=0.925)
 
 
-class NewUser(tk.Frame):  # user creation menu
-    def __init__(self, parent):
-        tk.Frame.__init__(self, parent)
-        self.configure(bg=DARK_GREY)
 
-        # data entries
-        tk.Label(self, text="New User", font=font_20, fg=ACCENT_COLOUR, bg=DARK_GREY) \
-            .pack(pady=(rel_height(0.45), 0))
 
-        usr = tk.Entry(self, font=font_20, bg=DARK_GREY, fg=ACCENT_COLOUR,
-                       highlightbackground=LIGHT_GREY)
-        usr.pack(pady=(rel_height(0.1), 0))
-
-        pwd = tk.Entry(self, font=font_20, bg=DARK_GREY, fg=ACCENT_COLOUR,
-                       highlightbackground=LIGHT_GREY)
-        pwd.pack(pady=(2, 0))
-
-        def create_user():
-            passwd = hashlib.sha256(pwd.get().encode('utf-8')).hexdigest()  # hash the password entry
-            conn = sqlite3.connect("logins.db")
-            c = conn.cursor()
-            new_uuid = str(uuid.uuid1())
-            c.execute("INSERT INTO logins VALUES (?, ?, ?)", (new_uuid, usr.get(), passwd))  # write to the database
-            c.execute('SELECT * FROM logins')
-            conn.commit()
-            conn.close()
-            app.show_frame(LoginMenu)  # go back to the login menu
-
-            with open("settings.json", "r") as settings_file:  # create a default settings profile for the new user
-                settings = json.load(settings_file)  # get settings
-                settings.append({"uuid": new_uuid, "favourites": ["BTC", "ETH", "XRP", "LTC", "LINK", "ADA"]})  # add
-            with open("settings.json", "w") as settings_file:
-                json.dump(settings, settings_file, indent=4)  # write new settings
-
-        tk.Button(self, text="Create", font=font_20, bg=DARK_GREY, fg=LIGHT_GREY,
-                  command=lambda: create_user()).pack(pady=(rel_height(0.1), 0))
 
 
 class MainMenu(tk.Frame):  # main menu
@@ -217,7 +105,7 @@ class MainMenu(tk.Frame):  # main menu
             # graphs
             graphs_x = [0.05, 0.05, 0.05, 0.1 + (0.8 / 3), 0.1 + (0.8 / 3), 0.1 + (0.8 / 3)]
             graphs_y = [0.235, 0.4875, 0.74, 0.235, 0.4875, 0.74]  # where to place each iteration
-            with open("settings.json", "r") as settings_file:
+            with open("data/settings.json", "r") as settings_file:
                 profiles = json.load(settings_file)
                 for profile in profiles:  # search profiles for the current users preferences
                     if profile["uuid"] == user_id:
@@ -471,7 +359,7 @@ class CoinPage(tk.Frame):  # second page
 
         def coin_gecko_stats():  # stats from CoinGecko.com
             cg_id = None
-            with open("cg_coins.json", "r") as cg_file:
+            with open("data/cg_coins.json", "r") as cg_file:
                 cg_ids = json.load(cg_file)
                 for item in cg_ids:
                     if item["symbol"].upper() == coin:
@@ -516,7 +404,7 @@ class SettingsMenu(tk.Frame):  # second page
                          height=6, font=font_25)
         editor.pack()
 
-        with open("settings.json", "r") as settings_file:
+        with open("data/settings.json", "r") as settings_file:
             profiles = json.load(settings_file)
             for profile in profiles:
                 if profile["uuid"] == user_id:  # identify the user by their ID
@@ -527,7 +415,7 @@ class SettingsMenu(tk.Frame):  # second page
         def save_settings():
             modification = list(editor.get("1.0", "end-1c").splitlines())  # add values to a list
             profile["favourites"] = modification
-            with open("settings.json", "w") as settings_file2:  # write the profile back to the settings file
+            with open("data/settings.json", "w") as settings_file2:  # write the profile back to the settings file
                 json.dump(profiles, settings_file2, indent=4)
 
         save_button = tk.Button(self, command=lambda: save_settings(), font=font_20,
