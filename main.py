@@ -148,8 +148,8 @@ class LoginMenu(tk.Frame):  # login menu
                   command=lambda: load_main()).place(relx=0.45, rely=0.52)
 
         # new user
-        tk.Button(self, text="Add User", font=SMALL_FONT, bg=DARK_GREY, fg=LIGHT_GREY,
-                  command=lambda: app.show_frame(NewUser)).place(relx=0.876, rely=0.925)
+        tk.Button(self, text="Add User", font=font_48, bg=DARK_GREY, fg=LIGHT_GREY,
+                  command=lambda: app.show_frame(NewUser)).place(relx=0.885, rely=0.91)
 
 
 class NewUser(tk.Frame):  # user creation menu
@@ -546,8 +546,6 @@ class AIPage(tk.Frame):  # machine learning page
 
         app.bind("<Escape>", clear_page)
 
-        # TODO extraordinarily broken progress bar - doesn't increase bit by bit due to thread
-
         def draw_graph():  # standard graph drawing method with additional data
             figure = plt.Figure(figsize=(1.0 * res_width / 100, 1.0 * res_height / 100), facecolor=DARK_GREY)
 
@@ -570,7 +568,8 @@ class AIPage(tk.Frame):  # machine learning page
             ax.plot(df["Close time"], df["Close"].astype(float), "-b")
 
             # loading text covered by graph
-            tk.Label(self, text="Loading, please wait...", font=LARGE_FONT, bg=DARK_GREY, fg=ACCENT_COLOUR) \
+            loading_bar = ""  #TODO dont work
+            tk.Label(self, text=f"{loading_bar}", font=LARGE_FONT, bg=DARK_GREY, fg=ACCENT_COLOUR) \
                 .place(relx=0.5, rely=0.5, anchor="center")
 
             # lstm
@@ -578,6 +577,7 @@ class AIPage(tk.Frame):  # machine learning page
             lstm_time = [df["Close time"].iloc[-1] + 60000]
             for i in range(99):
                 lstm_time.append(lstm_time[-1] + 60000)
+                loading_bar += "▇"
                 app.update_idletasks()
             ax.plot(lstm_time, lstm_res, "-w")  # add the machine learnt data on top
 
