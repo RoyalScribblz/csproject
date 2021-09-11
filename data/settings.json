@@ -62,7 +62,18 @@
             "XRP",
             "LTC",
             "LINK",
-            "ADA"
+            "WAXP"
+        ]
+    },
+    {
+        "uuid": "07f32528-1258-11ec-a354-218e038de4be",
+        "favourites": [
+            "BTC",
+            "ETH",
+            "XRP",
+            "LTC",
+            "LINK",
+            "TRX"
         ]
     }
 ]

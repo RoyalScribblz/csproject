@@ -393,7 +393,7 @@ class CoinPage(tk.Frame):  # second page
 
             # styling
             ax = figure.add_subplot(111, fc=DARK_GREY)
-            ax.set_xlabel("Time (minutes)", fontsize=round(res_height / 80))
+            ax.set_xlabel("Time (hrs)", fontsize=round(res_height / 80))
             ax.set_ylabel("RSI (%)", fontsize=round(res_height / 80))
             ax.xaxis.label.set_color(LIGHT_GREY)
             ax.yaxis.label.set_color(LIGHT_GREY)
@@ -552,7 +552,7 @@ class AIPage(tk.Frame):  # machine learning page
             # styling
             ax = figure.add_subplot(111, fc=DARK_GREY)
             ax.set_xlabel("Time (minutes)", fontsize=round(res_height / 80))
-            ax.set_ylabel("RSI (%)", fontsize=round(res_height / 80))
+            ax.set_ylabel("Price ($)", fontsize=round(res_height / 80))
             ax.xaxis.label.set_color(LIGHT_GREY)
             ax.yaxis.label.set_color(LIGHT_GREY)
             for axis in ["bottom", "left"]:  # modify borders
@@ -565,23 +565,33 @@ class AIPage(tk.Frame):  # machine learning page
             figure.subplots_adjust(left=0.1, right=1.0, bottom=0.15, top=1.0)
             figure.tight_layout()
 
-            ax.plot(df["Close time"], df["Close"].astype(float), "-b")
+            ax.plot([i * -1 / 60 for i in range(0, 1440)][::-1], df["Close"].astype(float), "-b")
 
             # loading text covered by graph
-            loading_bar = ""  #TODO dont work
-            tk.Label(self, text=f"{loading_bar}", font=LARGE_FONT, bg=DARK_GREY, fg=ACCENT_COLOUR) \
-                .place(relx=0.5, rely=0.5, anchor="center")
+            loading_text = tk.Label(self, text="Processing, please wait", font=font_20, bg=DARK_GREY, fg=ACCENT_COLOUR)
+            loading_text.place(relx=0.5, rely=0.5, anchor="center")
+
+            load_finished = False  # stop loading "animation" when done
+
+            def update_dots():
+                old_text = loading_text.cget("text")
+                if len(old_text) < 26:  # add up to 3 dots then loop
+                    new_text = old_text + "."
+                else:
+                    new_text = "Processing, please wait"
+                loading_text.config(text=new_text)
+                if not load_finished:
+                    loading_text.after(1000, update_dots)  # repeat every second
+
+            update_dots()
 
             # lstm
             lstm_res = lstm(df["Close"].astype(float).tolist(), 100)
-            lstm_time = [df["Close time"].iloc[-1] + 60000]
-            for i in range(99):
-                lstm_time.append(lstm_time[-1] + 60000)
-                loading_bar += "▇"
-                app.update_idletasks()
+            lstm_time = [i / 60 for i in range(1, 101)]
             ax.plot(lstm_time, lstm_res, "-w")  # add the machine learnt data on top
 
             FigureCanvasTkAgg(figure, self).get_tk_widget().place(x=0, y=0)
+            load_finished = True
 
         threading.Thread(target=draw_graph).start()  # start in a new thread
 
