@@ -506,6 +506,13 @@ class SettingsMenu(tk.Frame):  # second page
         def clear_page(event):  # wipe the page
             for child in self.winfo_children():
                 child.destroy()  # destroy all widgets
+
+            # reset main menu
+            mm = app.frames[MainMenu]
+            for child in mm.winfo_children():
+                child.destroy()  # destroy all widgets on main menu
+            MainMenu.load_page(mm)  # load the main menu
+            self.update_idletasks()  # make page transition less choppy
             app.show_frame(MainMenu)
 
         app.bind("<Escape>", clear_page)

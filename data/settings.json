@@ -75,5 +75,16 @@
             "LINK",
             "TRX"
         ]
+    },
+    {
+        "uuid": "4f1414bc-3d5a-11ec-bb80-3d8ef6b9f1bb",
+        "favourites": [
+            "BTC",
+            "ETH",
+            "XRP",
+            "LTC",
+            "LINK",
+            "WAXP"
+        ]
     }
 ]
