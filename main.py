@@ -511,7 +511,7 @@ class SettingsMenu(tk.Frame):  # second page
             mm = app.frames[MainMenu]
             for child in mm.winfo_children():
                 child.destroy()  # destroy all widgets on main menu
-            MainMenu.load_page(mm)  # load the main menu
+            mm.load_page()  # load the main menu
             self.update_idletasks()  # make page transition less choppy
             app.show_frame(MainMenu)
 
@@ -531,9 +531,14 @@ class SettingsMenu(tk.Frame):  # second page
         # save button and function
         def save_settings():
             modification = list(editor.get("1.0", "end-1c").splitlines())  # add values to a list
-            profile["favourites"] = modification
-            with open("data/settings.json", "w") as settings_file2:  # write the profile back to the settings file
-                json.dump(profiles, settings_file2, indent=4)
+            with open("data/settings.json", "r") as settings_file2:  # open to read
+                profiles2 = json.load(settings_file2)  # read the files data
+                for profile2 in profiles2:  # loop through each profile
+                    if profile2["uuid"] == user_id:  # identify the user by their ID
+                        profile2["favourites"] = modification
+
+            with open("data/settings.json", "w") as settings_file2:  # open to write
+                json.dump(profiles2, settings_file2, indent=4)  # write back to the file
 
         save_button = tk.Button(self, command=lambda: save_settings(), font=font_20,
                                 text="Save", bg=BOX_COLOUR, fg=ACCENT_COLOUR, highlightbackground=WHITE)
