@@ -136,16 +136,18 @@ class LoginMenu(tk.Frame):  # login menu
             return False  # unsuccessful login
 
         # login entries
+        tk.Label(self, text="Username:", font=font_25, bg=DARK_GREY, fg=ACCENT_COLOUR).place(relx=0.28, rely=0.34)
         usr = tk.Entry(self, font=font_28, bg=DARK_GREY, fg=ACCENT_COLOUR,
                        highlightbackground=LIGHT_GREY)
-        usr.place(relx=0.35, rely=0.32, width=0.3 * res_width, height=0.1 * res_height)
+        usr.place(relx=0.43, rely=0.32, width=0.3 * res_width, height=0.1 * res_height)
 
+        tk.Label(self, text="Password:", font=font_25, bg=DARK_GREY, fg=ACCENT_COLOUR).place(relx=0.28, rely=0.44)
         pwd = tk.Entry(self, font=font_28, bg=DARK_GREY, fg=ACCENT_COLOUR,
                        highlightbackground=LIGHT_GREY)
-        pwd.place(relx=0.35, rely=0.42, width=0.3 * res_width, height=0.1 * res_height)
+        pwd.place(relx=0.43, rely=0.42, width=0.3 * res_width, height=0.1 * res_height)
 
         tk.Button(self, text="Login", font=font_28, bg=DARK_GREY, fg=LIGHT_GREY,
-                  command=lambda: load_main()).place(relx=0.45, rely=0.52)
+                  command=lambda: load_main()).place(relx=0.45, rely=0.56)
 
         # new user
         tk.Button(self, text="Add User", font=font_48, bg=DARK_GREY, fg=LIGHT_GREY,
@@ -393,7 +395,7 @@ class CoinPage(tk.Frame):  # second page
 
             # styling
             ax = figure.add_subplot(111, fc=DARK_GREY)
-            ax.set_xlabel("Time (hrs)", fontsize=round(res_height / 80))
+            ax.set_xlabel("Time (minutes)", fontsize=round(res_height / 80))
             ax.set_ylabel("RSI (%)", fontsize=round(res_height / 80))
             ax.xaxis.label.set_color(LIGHT_GREY)
             ax.yaxis.label.set_color(LIGHT_GREY)
