@@ -149,9 +149,14 @@ class LoginMenu(tk.Frame):  # login menu
         tk.Button(self, text="Login", font=font_28, bg=DARK_GREY, fg=LIGHT_GREY,
                   command=lambda: load_main()).place(relx=0.45, rely=0.56)
 
+        def load_new_usr():
+            NewUser.load_page(app.frames[NewUser])  # load the main menu
+            self.update_idletasks()  # make page transition less choppy
+            app.show_frame(NewUser)
+
         # new user
         tk.Button(self, text="Add User", font=font_48, bg=DARK_GREY, fg=LIGHT_GREY,
-                  command=lambda: app.show_frame(NewUser)).place(relx=0.885, rely=0.91)
+                  command=lambda: load_new_usr()).place(relx=0.885, rely=0.91)
 
 
 class NewUser(tk.Frame):  # user creation menu
@@ -159,17 +164,20 @@ class NewUser(tk.Frame):  # user creation menu
         tk.Frame.__init__(self, parent)
         self.configure(bg=DARK_GREY)
 
+    def load_page(self):
         # data entries
-        tk.Label(self, text="New User", font=font_20, fg=ACCENT_COLOUR, bg=DARK_GREY) \
-            .pack(pady=(rel_height(0.45), 0))
+        tk.Label(self, text="New User", font=font_25, bg=DARK_GREY, fg=ACCENT_COLOUR)\
+            .place(anchor="center", relx=0.5, rely=0.2)
 
-        usr = tk.Entry(self, font=font_20, bg=DARK_GREY, fg=ACCENT_COLOUR,
+        tk.Label(self, text="Username:", font=font_25, bg=DARK_GREY, fg=ACCENT_COLOUR).place(relx=0.28, rely=0.34)
+        usr = tk.Entry(self, font=font_28, bg=DARK_GREY, fg=ACCENT_COLOUR,
                        highlightbackground=LIGHT_GREY)
-        usr.pack(pady=(rel_height(0.1), 0))
+        usr.place(relx=0.43, rely=0.32, width=0.3 * res_width, height=0.1 * res_height)
 
-        pwd = tk.Entry(self, font=font_20, bg=DARK_GREY, fg=ACCENT_COLOUR,
+        tk.Label(self, text="Password:", font=font_25, bg=DARK_GREY, fg=ACCENT_COLOUR).place(relx=0.28, rely=0.44)
+        pwd = tk.Entry(self, font=font_28, bg=DARK_GREY, fg=ACCENT_COLOUR,
                        highlightbackground=LIGHT_GREY)
-        pwd.pack(pady=(2, 0))
+        pwd.place(relx=0.43, rely=0.42, width=0.3 * res_width, height=0.1 * res_height)
 
         def create_user():
             passwd = hashlib.sha256(pwd.get().encode('utf-8')).hexdigest()  # hash the password entry
@@ -188,8 +196,8 @@ class NewUser(tk.Frame):  # user creation menu
             with open("data/settings.json", "w") as settings_file:
                 json.dump(settings, settings_file, indent=4)  # write new settings
 
-        tk.Button(self, text="Create", font=font_20, bg=DARK_GREY, fg=LIGHT_GREY,
-                  command=lambda: create_user()).pack(pady=(rel_height(0.1), 0))
+        tk.Button(self, text="Create", font=font_25, bg=DARK_GREY, fg=LIGHT_GREY,
+                  command=lambda: create_user()).place(anchor="center", relx=0.5, rely=0.6)
 
 
 class MainMenu(tk.Frame):  # main menu
