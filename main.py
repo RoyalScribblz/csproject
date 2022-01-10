@@ -589,8 +589,8 @@ class AIPage(tk.Frame):  # machine learning page
                 ax.spines[axis].set_linewidth(0)
             for axis in ["x", "y"]:
                 ax.tick_params(axis=axis, colors=LIGHT_GREY, which="both", width=2)
-            figure.subplots_adjust(left=0.1, right=1.0, bottom=0.15, top=1.0)
             figure.tight_layout()
+            figure.subplots_adjust(left=0.04, right=0.98, bottom=0.05, top=0.98)
 
             ax.plot([i * -1 / 60 for i in range(0, 1440)][::-1], df["Close"].astype(float), "-b")
 
