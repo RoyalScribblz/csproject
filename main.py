@@ -177,13 +177,13 @@ class NewUser(tk.Frame):  # user creation menu
 
         tk.Label(self, text="Username:", font=font_25, bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR) \
             .place(relx=0.28, rely=0.34)
-        usr = tk.Entry(self, font=font_28, bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR,
+        usr = tk.Entry(self, font=font_28, bg=BACKGROUND_COLOUR, fg=TEXT_COLOUR,
                        highlightbackground=SECONDARY_COLOUR)
         usr.place(relx=0.43, rely=0.32, width=0.3 * res_width, height=0.1 * res_height)
 
         tk.Label(self, text="Password:", font=font_25, bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR) \
             .place(relx=0.28, rely=0.44)
-        pwd = tk.Entry(self, font=font_28, bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR,
+        pwd = tk.Entry(self, font=font_28, bg=BACKGROUND_COLOUR, fg=TEXT_COLOUR,
                        highlightbackground=SECONDARY_COLOUR)
         pwd.place(relx=0.43, rely=0.42, width=0.3 * res_width, height=0.1 * res_height)
 
