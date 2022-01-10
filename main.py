@@ -34,10 +34,11 @@ font_80 = None
 SMALL_FONT = ("Consolas", 30)
 
 WHITE = "#000000"
-DARK_GREY = "#15151c"
-ACCENT_COLOUR = "#3ac7c2"
-LIGHT_GREY = "#67676b"
-BOX_COLOUR = "#1b1b24"
+BACKGROUND_COLOUR = "#16191a"
+SECONDARY_COLOUR = "#202123"
+LINE_COLOUR = "#484a4d"
+TEXT_COLOUR = "#cdd0cd"
+ACCENT_COLOUR = "#0bb277"
 
 
 def rel_width(multiplier): return round(multiplier * res_width)
@@ -75,7 +76,7 @@ class Startup(tk.Frame):  # startup page
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
 
-        self.configure(bg=DARK_GREY)  # background colour
+        self.configure(bg=BACKGROUND_COLOUR)  # background colour
 
         # set the resolution variables and load the login menu
         def load_main():
@@ -102,15 +103,15 @@ class Startup(tk.Frame):  # startup page
             app.show_frame(LoginMenu)
 
         # widgets
-        tk.Label(self, text="Loading", font=LARGE_FONT, bg=DARK_GREY, fg=ACCENT_COLOUR).pack()
-        tk.Button(self, text="Press to continue", font=SMALL_FONT, bg=DARK_GREY, fg=LIGHT_GREY,
+        tk.Label(self, text="Loading", font=LARGE_FONT, bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR).pack()
+        tk.Button(self, text="Press to continue", font=SMALL_FONT, bg=SECONDARY_COLOUR, fg=TEXT_COLOUR,
                   command=lambda: load_main()).pack()
 
 
 class LoginMenu(tk.Frame):  # login menu
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
-        self.configure(bg=DARK_GREY)
+        self.configure(bg=BACKGROUND_COLOUR)
 
     def load_page(self):
         # load the main menu with the entered user
@@ -136,20 +137,22 @@ class LoginMenu(tk.Frame):  # login menu
             return False  # unsuccessful login
 
         # login entries
-        tk.Label(self, text="Login", font=font_25, bg=DARK_GREY, fg=ACCENT_COLOUR) \
+        tk.Label(self, text="Login", font=font_25, bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR) \
             .place(anchor="center", relx=0.5, rely=0.2)
 
-        tk.Label(self, text="Username:", font=font_25, bg=DARK_GREY, fg=ACCENT_COLOUR).place(relx=0.28, rely=0.34)
-        usr = tk.Entry(self, font=font_28, bg=DARK_GREY, fg=ACCENT_COLOUR,
-                       highlightbackground=LIGHT_GREY)
+        tk.Label(self, text="Username:", font=font_25, bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR) \
+            .place(relx=0.28, rely=0.34)
+        usr = tk.Entry(self, font=font_28, bg=BACKGROUND_COLOUR, fg=TEXT_COLOUR,
+                       highlightbackground=SECONDARY_COLOUR)
         usr.place(relx=0.43, rely=0.32, width=0.3 * res_width, height=0.1 * res_height)
 
-        tk.Label(self, text="Password:", font=font_25, bg=DARK_GREY, fg=ACCENT_COLOUR).place(relx=0.28, rely=0.44)
-        pwd = tk.Entry(self, font=font_28, bg=DARK_GREY, fg=ACCENT_COLOUR,
-                       highlightbackground=LIGHT_GREY)
+        tk.Label(self, text="Password:", font=font_25, bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR) \
+            .place(relx=0.28, rely=0.44)
+        pwd = tk.Entry(self, font=font_28, bg=BACKGROUND_COLOUR, fg=TEXT_COLOUR,
+                       highlightbackground=SECONDARY_COLOUR)
         pwd.place(relx=0.43, rely=0.42, width=0.3 * res_width, height=0.1 * res_height)
 
-        tk.Button(self, text="Login", font=font_28, bg=DARK_GREY, fg=LIGHT_GREY,
+        tk.Button(self, text="Login", font=font_28, bg=SECONDARY_COLOUR, fg=TEXT_COLOUR,
                   command=lambda: load_main()).place(relx=0.45, rely=0.56)
 
         def load_new_usr():
@@ -158,28 +161,30 @@ class LoginMenu(tk.Frame):  # login menu
             app.show_frame(NewUser)
 
         # new user
-        tk.Button(self, text="Add User", font=font_48, bg=DARK_GREY, fg=LIGHT_GREY,
+        tk.Button(self, text="Add User", font=font_48, bg=SECONDARY_COLOUR, fg=TEXT_COLOUR,
                   command=lambda: load_new_usr()).place(relx=0.885, rely=0.91)
 
 
 class NewUser(tk.Frame):  # user creation menu
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
-        self.configure(bg=DARK_GREY)
+        self.configure(bg=BACKGROUND_COLOUR)
 
     def load_page(self):
         # data entries
-        tk.Label(self, text="New User", font=font_25, bg=DARK_GREY, fg=ACCENT_COLOUR)\
+        tk.Label(self, text="New User", font=font_25, bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR) \
             .place(anchor="center", relx=0.5, rely=0.2)
 
-        tk.Label(self, text="Username:", font=font_25, bg=DARK_GREY, fg=ACCENT_COLOUR).place(relx=0.28, rely=0.34)
-        usr = tk.Entry(self, font=font_28, bg=DARK_GREY, fg=ACCENT_COLOUR,
-                       highlightbackground=LIGHT_GREY)
+        tk.Label(self, text="Username:", font=font_25, bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR) \
+            .place(relx=0.28, rely=0.34)
+        usr = tk.Entry(self, font=font_28, bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR,
+                       highlightbackground=SECONDARY_COLOUR)
         usr.place(relx=0.43, rely=0.32, width=0.3 * res_width, height=0.1 * res_height)
 
-        tk.Label(self, text="Password:", font=font_25, bg=DARK_GREY, fg=ACCENT_COLOUR).place(relx=0.28, rely=0.44)
-        pwd = tk.Entry(self, font=font_28, bg=DARK_GREY, fg=ACCENT_COLOUR,
-                       highlightbackground=LIGHT_GREY)
+        tk.Label(self, text="Password:", font=font_25, bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR) \
+            .place(relx=0.28, rely=0.44)
+        pwd = tk.Entry(self, font=font_28, bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR,
+                       highlightbackground=SECONDARY_COLOUR)
         pwd.place(relx=0.43, rely=0.42, width=0.3 * res_width, height=0.1 * res_height)
 
         def create_user():
@@ -199,7 +204,7 @@ class NewUser(tk.Frame):  # user creation menu
             with open("data/settings.json", "w") as settings_file:
                 json.dump(settings, settings_file, indent=4)  # write new settings
 
-        tk.Button(self, text="Create", font=font_25, bg=DARK_GREY, fg=LIGHT_GREY,
+        tk.Button(self, text="Create", font=font_25, bg=SECONDARY_COLOUR, fg=TEXT_COLOUR,
                   command=lambda: create_user()).place(anchor="center", relx=0.5, rely=0.6)
 
 
@@ -207,15 +212,16 @@ class MainMenu(tk.Frame):  # main menu
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
         self.cog_image = None  # make variable for image else it will be garbage collected
-        self.configure(bg=DARK_GREY)
+        self.configure(bg=BACKGROUND_COLOUR)
 
     def load_page(self):
         # blank canvas for drawing shapes
-        canvas = tk.Canvas(self, width=res_width, height=res_height, bg=DARK_GREY, highlightbackground=DARK_GREY)
+        canvas = tk.Canvas(self, width=res_width, height=res_height, bg=BACKGROUND_COLOUR,
+                           highlightbackground=BACKGROUND_COLOUR)
         canvas.pack()
 
         # working clock
-        clock = tk.Label(self, font=font_28, bg=DARK_GREY, fg=LIGHT_GREY)
+        clock = tk.Label(self, font=font_28, bg=BACKGROUND_COLOUR, fg=TEXT_COLOUR)
         clock.place(relx=0.8, rely=0.08)
 
         def tick():
@@ -236,7 +242,8 @@ class MainMenu(tk.Frame):  # main menu
 
             for index in range(6):
                 df = get_klines(fav_coins[index][0] + "USDT", 1, "h", 24)  # retrieve the candlestick data
-                figure = plt.Figure(figsize=(0.3 * res_width / 100, 0.26 * res_height / 100), facecolor=DARK_GREY)
+                figure = plt.Figure(figsize=(0.3 * res_width / 100, 0.26 * res_height / 100),
+                                    facecolor=BACKGROUND_COLOUR)
                 start_price = float(df["Close"][0])
                 end_price = float(df["Close"][23])
                 if end_price > start_price:
@@ -245,26 +252,26 @@ class MainMenu(tk.Frame):  # main menu
                     colour = "r"  # red otherwise
 
                 # styling
-                ax = figure.add_subplot(111, fc=DARK_GREY)
+                ax = figure.add_subplot(111, fc=BACKGROUND_COLOUR)
                 ax.set_xlabel("Time (hrs)", fontsize=round(res_height / 80))
                 ax.set_ylabel("Value ($)", fontsize=round(res_height / 80))
-                ax.xaxis.label.set_color(LIGHT_GREY)
-                ax.yaxis.label.set_color(LIGHT_GREY)
+                ax.xaxis.label.set_color(TEXT_COLOUR)
+                ax.yaxis.label.set_color(TEXT_COLOUR)
                 for axis in ["bottom", "left"]:  # modify borders
-                    ax.spines[axis].set_color(LIGHT_GREY)
+                    ax.spines[axis].set_color(LINE_COLOUR)
                     ax.spines[axis].set_linewidth(3)
                 for axis in ["top", "right"]:  # remove borders
                     ax.spines[axis].set_linewidth(0)
                 for axis in ["x", "y"]:
-                    ax.tick_params(axis=axis, colors=LIGHT_GREY, which="both", width=2)
+                    ax.tick_params(axis=axis, colors=LINE_COLOUR, which="both", width=2)
                 figure.tight_layout()
                 figure.subplots_adjust(left=0.11)
 
                 ax.plot([i * -1 for i in range(0, 24)][::-1], df["Close"].astype(float), "-" + colour)  # over -24hr
                 FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=graphs_x[index], rely=graphs_y[index])
 
-                tk.Label(self, text=str(fav_coins[index][0]).upper(), font=font_80, bg=BOX_COLOUR, fg=ACCENT_COLOUR) \
-                    .place(relx=graphs_x[index] + 0.26, rely=graphs_y[index] + 0.03)
+                tk.Label(self, text=str(fav_coins[index][0]).upper(), font=font_80, bg=SECONDARY_COLOUR,
+                         fg=TEXT_COLOUR).place(relx=graphs_x[index] + 0.26, rely=graphs_y[index] + 0.03)
 
                 # percentage change
                 change = ((end_price - start_price) / start_price) * 100
@@ -281,15 +288,15 @@ class MainMenu(tk.Frame):  # main menu
                 name = change[0]  # for equal spacing
                 while len(name) < 4:
                     name += " "  # add a space until 4 characters long
-                tk.Label(self, text=f"{name} | {symbol}{change[1]}%", font=font_25, bg=DARK_GREY, fg=LIGHT_GREY) \
-                    .place(relx=(0.165 + ((0.8 / 3) * 2)), rely=y)
+                tk.Label(self, text=f"{name} | {symbol}{change[1]}%", font=font_25, bg=BACKGROUND_COLOUR,
+                         fg=TEXT_COLOUR).place(relx=0.71, rely=y)
                 y += 0.09
 
         threading.Thread(target=graph_drawing).start()  # start in new thread to prevent app freeze
 
         # search bar
-        search = tk.Entry(self, font=font_28, bg=DARK_GREY, fg=ACCENT_COLOUR,
-                          highlightbackground=LIGHT_GREY)
+        search = tk.Entry(self, font=font_28, bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR,
+                          highlightbackground=SECONDARY_COLOUR)
         search.insert(0, " Search")
 
         def clear_search(event):  # clear the search bar when left click
@@ -310,11 +317,11 @@ class MainMenu(tk.Frame):  # main menu
         # grid on right hand side
         canvas.create_rectangle(round((0.15 + ((0.8 / 3) * 2)) * res_width), round(0.25 * res_height),
                                 round((0.15 + ((0.8 / 3) * 3)) * res_width), round(0.95 * res_height),
-                                width=5, outline=LIGHT_GREY)
+                                width=5, outline=LINE_COLOUR)
         canvas.create_line(round((0.15 + ((0.8 / 3) * 2)) * res_width), round(0.35 * res_height),
                            round((0.15 + ((0.8 / 3) * 3)) * res_width), round(0.35 * res_height),
-                           width=5, fill=LIGHT_GREY)
-        top_gains = tk.Label(self, text="(%) Change", font=font_25, bg=DARK_GREY, fg=ACCENT_COLOUR)
+                           width=5, fill=LINE_COLOUR)
+        top_gains = tk.Label(self, text="(%) Change", font=font_25, bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR)
         top_gains.place(relx=(0.17 + ((0.8 / 3) * 2)), rely=0.27)
 
         # settings button
@@ -325,8 +332,8 @@ class MainMenu(tk.Frame):  # main menu
 
         self.cog_image = ImageTk.PhotoImage(Image.open("images/cog.png")
                                             .resize((rel_width(0.075), rel_height(0.14)), Image.ANTIALIAS))
-        settings = tk.Button(self, image=self.cog_image, text="test", bg=DARK_GREY, highlightthickness=0, bd=0,
-                             activebackground=DARK_GREY, command=lambda: open_settings())
+        settings = tk.Button(self, image=self.cog_image, text="test", bg=BACKGROUND_COLOUR, highlightthickness=0, bd=0,
+                             activebackground=TEXT_COLOUR, command=lambda: open_settings())
         settings.place(relx=0.06, rely=0.05, width=rel_width(0.08), height=rel_height(0.14))
 
 
@@ -335,7 +342,7 @@ class CoinPage(tk.Frame):  # second page
         tk.Frame.__init__(self, parent)
 
     def load_page(self, coin):
-        self.configure(bg=DARK_GREY)
+        self.configure(bg=BACKGROUND_COLOUR)
 
         def clear_page(event):  # wipe the page
             for child in self.winfo_children():
@@ -344,7 +351,7 @@ class CoinPage(tk.Frame):  # second page
 
         app.bind("<Escape>", clear_page)  # return to main menu with escape key
 
-        tk.Label(self, text=coin + " / USDT", font=font_48, fg=LIGHT_GREY, bg=DARK_GREY) \
+        tk.Label(self, text=coin + " / USDT", font=font_48, fg=SECONDARY_COLOUR, bg=BACKGROUND_COLOUR) \
             .pack(pady=rel_height(0.01))
 
         def draw_graph():
@@ -352,19 +359,19 @@ class CoinPage(tk.Frame):  # second page
             reverse_time = [i * -1 for i in range(0, 1440)][::-1]
 
             # volume graph first (for overlap)
-            figure = plt.Figure(figsize=(0.7 * res_width / 100, 0.2 * res_height / 100), facecolor=DARK_GREY)
+            figure = plt.Figure(figsize=(0.7 * res_width / 100, 0.2 * res_height / 100), facecolor=BACKGROUND_COLOUR)
 
-            ax = figure.add_subplot(111, fc=DARK_GREY)
+            ax = figure.add_subplot(111, fc=BACKGROUND_COLOUR)
             ax.set_ylabel("Volume ($)", fontsize=round(res_height / 80))
-            ax.xaxis.label.set_color(LIGHT_GREY)
-            ax.yaxis.label.set_color(LIGHT_GREY)
+            ax.xaxis.label.set_color(TEXT_COLOUR)
+            ax.yaxis.label.set_color(TEXT_COLOUR)
             for axis in ["left"]:  # modify borders
-                ax.spines[axis].set_color(LIGHT_GREY)
+                ax.spines[axis].set_color(LINE_COLOUR)
                 ax.spines[axis].set_linewidth(3)
             for axis in ["top", "right", "bottom"]:  # remove borders
                 ax.spines[axis].set_linewidth(0)
             for axis in ["x", "y"]:
-                ax.tick_params(axis=axis, colors=LIGHT_GREY, which="both", width=2)
+                ax.tick_params(axis=axis, colors=LINE_COLOUR, which="both", width=2)
             figure.tight_layout()
             figure.subplots_adjust(left=0.05, right=1.0, bottom=0.0, top=1.0)
 
@@ -372,7 +379,7 @@ class CoinPage(tk.Frame):  # second page
             FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.02, rely=0.06)
 
             # same methods as main menu graph production
-            figure = plt.Figure(figsize=(0.7 * res_width / 100, 0.45 * res_height / 100), facecolor=DARK_GREY)
+            figure = plt.Figure(figsize=(0.7 * res_width / 100, 0.45 * res_height / 100), facecolor=BACKGROUND_COLOUR)
             start_price = float(df["Close"][0])
             end_price = float(df["Close"][1439])
             if end_price > start_price:
@@ -380,17 +387,17 @@ class CoinPage(tk.Frame):  # second page
             else:
                 colour = "r"
 
-            ax = figure.add_subplot(111, fc=DARK_GREY)
+            ax = figure.add_subplot(111, fc=BACKGROUND_COLOUR)
             ax.set_ylabel("Price ($)", fontsize=round(res_height / 80))
-            ax.xaxis.label.set_color(LIGHT_GREY)
-            ax.yaxis.label.set_color(LIGHT_GREY)
+            ax.xaxis.label.set_color(TEXT_COLOUR)
+            ax.yaxis.label.set_color(TEXT_COLOUR)
             for axis in ["left"]:  # modify borders
-                ax.spines[axis].set_color(LIGHT_GREY)
+                ax.spines[axis].set_color(LINE_COLOUR)
                 ax.spines[axis].set_linewidth(3)
             for axis in ["top", "right", "bottom"]:  # remove borders
                 ax.spines[axis].set_linewidth(0)
             for axis in ["x", "y"]:
-                ax.tick_params(axis=axis, colors=LIGHT_GREY, which="both", width=2)
+                ax.tick_params(axis=axis, colors=LINE_COLOUR, which="both", width=2)
             figure.tight_layout()
             figure.subplots_adjust(left=0.05, right=1.0, bottom=0.0, top=1.0)
 
@@ -404,21 +411,21 @@ class CoinPage(tk.Frame):  # second page
 
             # relative strength index 1
             rsi_df1 = indicators.rsi(df, 14)
-            figure = plt.Figure(figsize=(0.7 * res_width / 100, 0.25 * res_height / 100), facecolor=DARK_GREY)
+            figure = plt.Figure(figsize=(0.7 * res_width / 100, 0.25 * res_height / 100), facecolor=BACKGROUND_COLOUR)
 
             # styling
-            ax = figure.add_subplot(111, fc=DARK_GREY)
+            ax = figure.add_subplot(111, fc=BACKGROUND_COLOUR)
             ax.set_xlabel("Time (minutes)", fontsize=round(res_height / 80))
             ax.set_ylabel("RSI (%)", fontsize=round(res_height / 80))
-            ax.xaxis.label.set_color(LIGHT_GREY)
-            ax.yaxis.label.set_color(LIGHT_GREY)
+            ax.xaxis.label.set_color(TEXT_COLOUR)
+            ax.yaxis.label.set_color(TEXT_COLOUR)
             for axis in ["bottom", "left"]:  # modify borders
-                ax.spines[axis].set_color(LIGHT_GREY)
+                ax.spines[axis].set_color(LINE_COLOUR)
                 ax.spines[axis].set_linewidth(3)
             for axis in ["top", "right"]:  # remove borders
                 ax.spines[axis].set_linewidth(0)
             for axis in ["x", "y"]:
-                ax.tick_params(axis=axis, colors=LIGHT_GREY, which="both", width=2)
+                ax.tick_params(axis=axis, colors=LINE_COLOUR, which="both", width=2)
             figure.tight_layout()
             figure.subplots_adjust(left=0.05, right=1.0, bottom=0.15, top=1.0)
 
@@ -438,37 +445,38 @@ class CoinPage(tk.Frame):  # second page
 
             # current price
             tk.Label(self, text="Price Now: $" + "{:,.2f}".format(end_price), font=font_34,
-                     bg=DARK_GREY, fg=ACCENT_COLOUR).place(relx=0.73, rely=0.1)
+                     bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR).place(relx=0.73, rely=0.1)
 
             # 24 hour high
             day_high = round(float(df["Close"].max()), 2)
             tk.Label(self, text="24hr High: $" + "{:,.2f}".format(day_high), font=font_34,
-                     bg=DARK_GREY, fg=ACCENT_COLOUR).place(relx=0.73, rely=0.18)
+                     bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR).place(relx=0.73, rely=0.18)
 
             # 24 hour low
             day_low = round(float(df["Close"].min()), 2)
             tk.Label(self, text="24hr Low: $" + "{:,.2f}".format(day_low), font=font_34,
-                     bg=DARK_GREY, fg=ACCENT_COLOUR).place(relx=0.73, rely=0.26)
+                     bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR).place(relx=0.73, rely=0.26)
 
             # 24 hour percentage change
             per_change = round(((end_price - start_price) / start_price) * 100, 2)
             per_change = "+" + str(per_change) if per_change > 0 else "" + str(per_change)
-            tk.Label(self, text="24hr Change: " + per_change + "%", font=font_34, bg=DARK_GREY, fg=ACCENT_COLOUR) \
+            tk.Label(self, text="24hr Change: " + per_change + "%", font=font_34, bg=BACKGROUND_COLOUR,
+                     fg=ACCENT_COLOUR) \
                 .place(relx=0.73, rely=0.34)
 
             # relative strength index 1
             current_rsi1 = round(rsi_df1.iloc[-1], 4)
-            tk.Label(self, text="14m RSI: " + str(current_rsi1), font=font_34, bg=DARK_GREY, fg=ACCENT_COLOUR) \
+            tk.Label(self, text="14m RSI: " + str(current_rsi1), font=font_34, bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR) \
                 .place(relx=0.73, rely=0.42)
 
             # relative strength index 2
             current_rsi2 = round(rsi_df2.iloc[-1], 4)
-            tk.Label(self, text="28m RSI: " + str(current_rsi2), font=font_34, bg=DARK_GREY, fg=ACCENT_COLOUR) \
+            tk.Label(self, text="28m RSI: " + str(current_rsi2), font=font_34, bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR) \
                 .place(relx=0.73, rely=0.50)
 
             # relative strength index 3
             current_rsi3 = round(rsi_df3.iloc[-1], 4)
-            tk.Label(self, text="56m RSI: " + str(current_rsi3), font=font_34, bg=DARK_GREY, fg=ACCENT_COLOUR) \
+            tk.Label(self, text="56m RSI: " + str(current_rsi3), font=font_34, bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR) \
                 .place(relx=0.73, rely=0.58)
 
             def run_ai(dataframe):  # execute ai separately so not demanding on hardware when unwanted
@@ -476,9 +484,8 @@ class CoinPage(tk.Frame):  # second page
                 self.update_idletasks()  # make page transition less choppy
                 app.show_frame(AIPage)
 
-            tk.Button(self, text="Initiate AI", bg=DARK_GREY, highlightthickness=0, bd=2,
-                      highlightbackground=LIGHT_GREY,
-                      font=font_34, activebackground=DARK_GREY, fg=LIGHT_GREY,
+            tk.Button(self, text="Initiate AI", bg=SECONDARY_COLOUR, highlightthickness=0, bd=2,
+                      font=font_34, activebackground=SECONDARY_COLOUR, fg=TEXT_COLOUR,
                       command=lambda: run_ai(df)).place(relx=0.78, rely=0.90)
 
         threading.Thread(target=draw_graph).start()  # run on new thread
@@ -498,16 +505,16 @@ class CoinPage(tk.Frame):  # second page
             # market cap
             market_cap = cg_data["market_data"]["market_cap"]["usd"]
             tk.Label(self, text="Market Cap: $" + utils.number_suffix(market_cap), font=font_34,
-                     bg=DARK_GREY, fg=ACCENT_COLOUR).place(relx=0.73, rely=0.66)
+                     bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR).place(relx=0.73, rely=0.66)
 
             # 24hr trade volume
             volume = cg_data["market_data"]["total_volume"]["usd"]
-            tk.Label(self, text="Trade Volume: $" + utils.number_suffix(volume), font=font_34, bg=DARK_GREY,
+            tk.Label(self, text="Trade Volume: $" + utils.number_suffix(volume), font=font_34, bg=BACKGROUND_COLOUR,
                      fg=ACCENT_COLOUR).place(relx=0.73, rely=0.74)
 
             # all time high
             ath = cg_data["market_data"]["ath"]["usd"]
-            tk.Label(self, text="All-Time Hi: $" + "{:,.2f}".format(ath), font=font_34, bg=DARK_GREY,
+            tk.Label(self, text="All-Time Hi: $" + "{:,.2f}".format(ath), font=font_34, bg=BACKGROUND_COLOUR,
                      fg=ACCENT_COLOUR).place(relx=0.73, rely=0.82)
 
         threading.Thread(target=coin_gecko_stats).start()  # start on new thread
@@ -516,7 +523,7 @@ class CoinPage(tk.Frame):  # second page
 class SettingsMenu(tk.Frame):  # second page
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
-        self.configure(bg=DARK_GREY)
+        self.configure(bg=BACKGROUND_COLOUR)
 
     def load_page(self):
         def clear_page(event):  # wipe the page
@@ -533,7 +540,7 @@ class SettingsMenu(tk.Frame):  # second page
 
         app.bind("<Escape>", clear_page)
 
-        editor = tk.Text(self, bg=BOX_COLOUR, fg=LIGHT_GREY, highlightbackground=WHITE,
+        editor = tk.Text(self, bg=SECONDARY_COLOUR, fg=LINE_COLOUR, highlightbackground=WHITE,
                          height=6, font=font_25)
         editor.pack()
 
@@ -558,15 +565,18 @@ class SettingsMenu(tk.Frame):  # second page
 
             clear_page(None)  # refresh and go to the main menu immediately
 
+        tk.Label(self, text="Replace Favourites By Typing", font=font_25, bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR) \
+            .place(anchor="center", relx=0.5, rely=0.5)
+
         save_button = tk.Button(self, command=lambda: save_settings(), font=font_20,
-                                text="Save", bg=BOX_COLOUR, fg=ACCENT_COLOUR, highlightbackground=WHITE)
-        save_button.pack()
+                                text="Save", bg=SECONDARY_COLOUR, fg=TEXT_COLOUR, highlightbackground=WHITE)
+        save_button.place(anchor="center", relx=0.5, rely=0.7)
 
 
 class AIPage(tk.Frame):  # machine learning page
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
-        self.configure(bg=DARK_GREY)
+        self.configure(bg=BACKGROUND_COLOUR)
 
     def load_page(self, df):
         def clear_page(event):  # wipe the page
@@ -577,28 +587,29 @@ class AIPage(tk.Frame):  # machine learning page
         app.bind("<Escape>", clear_page)
 
         def draw_graph():  # standard graph drawing method with additional data
-            figure = plt.Figure(figsize=(1.0 * res_width / 100, 1.0 * res_height / 100), facecolor=DARK_GREY)
+            figure = plt.Figure(figsize=(1.0 * res_width / 100, 1.0 * res_height / 100), facecolor=BACKGROUND_COLOUR)
 
             # styling
-            ax = figure.add_subplot(111, fc=DARK_GREY)
+            ax = figure.add_subplot(111, fc=BACKGROUND_COLOUR)
             ax.set_xlabel("Time (minutes)", fontsize=round(res_height / 80))
             ax.set_ylabel("Price ($)", fontsize=round(res_height / 80))
-            ax.xaxis.label.set_color(LIGHT_GREY)
-            ax.yaxis.label.set_color(LIGHT_GREY)
+            ax.xaxis.label.set_color(TEXT_COLOUR)
+            ax.yaxis.label.set_color(TEXT_COLOUR)
             for axis in ["bottom", "left"]:  # modify borders
-                ax.spines[axis].set_color(LIGHT_GREY)
+                ax.spines[axis].set_color(LINE_COLOUR)
                 ax.spines[axis].set_linewidth(3)
             for axis in ["top", "right"]:  # remove borders
                 ax.spines[axis].set_linewidth(0)
             for axis in ["x", "y"]:
-                ax.tick_params(axis=axis, colors=LIGHT_GREY, which="both", width=2)
+                ax.tick_params(axis=axis, colors=LINE_COLOUR, which="both", width=2)
             figure.tight_layout()
             figure.subplots_adjust(left=0.04, right=0.98, bottom=0.05, top=0.98)
 
-            ax.plot([i * -1 / 60 for i in range(0, 1440)][::-1], df["Close"].astype(float), "-b")
+            ax.plot([i * -1 / 60 for i in range(0, 1440)][::-1], df["Close"].astype(float), "-", color=ACCENT_COLOUR)
 
             # loading text covered by graph
-            loading_text = tk.Label(self, text="Processing, please wait", font=font_20, bg=DARK_GREY, fg=ACCENT_COLOUR)
+            loading_text = tk.Label(self, text="Processing, please wait", font=font_20, bg=BACKGROUND_COLOUR,
+                                    fg=ACCENT_COLOUR)
             loading_text.place(relx=0.5, rely=0.5, anchor="center")
 
             load_finished = False  # stop loading "animation" when done
