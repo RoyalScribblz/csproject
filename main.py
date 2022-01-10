@@ -136,6 +136,9 @@ class LoginMenu(tk.Frame):  # login menu
             return False  # unsuccessful login
 
         # login entries
+        tk.Label(self, text="Login", font=font_25, bg=DARK_GREY, fg=ACCENT_COLOUR) \
+            .place(anchor="center", relx=0.5, rely=0.2)
+
         tk.Label(self, text="Username:", font=font_25, bg=DARK_GREY, fg=ACCENT_COLOUR).place(relx=0.28, rely=0.34)
         usr = tk.Entry(self, font=font_28, bg=DARK_GREY, fg=ACCENT_COLOUR,
                        highlightbackground=LIGHT_GREY)
@@ -549,6 +552,8 @@ class SettingsMenu(tk.Frame):  # second page
 
             with open("data/settings.json", "w") as settings_file2:  # open to write
                 json.dump(profiles2, settings_file2, indent=4)  # write back to the file
+
+            clear_page(None)  # refresh and go to the main menu immediately
 
         save_button = tk.Button(self, command=lambda: save_settings(), font=font_20,
                                 text="Save", bg=BOX_COLOUR, fg=ACCENT_COLOUR, highlightbackground=WHITE)

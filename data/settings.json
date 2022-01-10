@@ -7,7 +7,7 @@
             "XRP",
             "HBAR",
             "SXP",
-            "DOGE"
+            "ADA"
         ]
     },
     {
@@ -85,6 +85,17 @@
             "LTC",
             "LINK",
             "RLC"
+        ]
+    },
+    {
+        "uuid": "cf6e97dd-7207-11ec-9d5d-001a7dda7111",
+        "favourites": [
+            "BTC",
+            "ETH",
+            "SC",
+            "LTC",
+            "AVA",
+            "LINK"
         ]
     }
 ]
