@@ -365,7 +365,8 @@ class CoinPage(tk.Frame):  # second page
                 ax.spines[axis].set_linewidth(0)
             for axis in ["x", "y"]:
                 ax.tick_params(axis=axis, colors=LIGHT_GREY, which="both", width=2)
-            figure.subplots_adjust(left=0.1, right=1.0, bottom=0.0, top=1.0)
+            figure.tight_layout()
+            figure.subplots_adjust(left=0.05, right=1.0, bottom=0.0, top=1.0)
 
             ax.plot(reverse_time, df["Volume"].astype(float), "-w")
             FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.02, rely=0.06)
@@ -390,7 +391,8 @@ class CoinPage(tk.Frame):  # second page
                 ax.spines[axis].set_linewidth(0)
             for axis in ["x", "y"]:
                 ax.tick_params(axis=axis, colors=LIGHT_GREY, which="both", width=2)
-            figure.subplots_adjust(left=0.1, right=1.0, bottom=0.0, top=1.0)
+            figure.tight_layout()
+            figure.subplots_adjust(left=0.05, right=1.0, bottom=0.0, top=1.0)
 
             ax.plot(reverse_time, df["Close"].astype(float), "-" + colour)  # plot main line
 
@@ -417,7 +419,8 @@ class CoinPage(tk.Frame):  # second page
                 ax.spines[axis].set_linewidth(0)
             for axis in ["x", "y"]:
                 ax.tick_params(axis=axis, colors=LIGHT_GREY, which="both", width=2)
-            figure.subplots_adjust(left=0.1, right=1.0, bottom=0.15, top=1.0)
+            figure.tight_layout()
+            figure.subplots_adjust(left=0.05, right=1.0, bottom=0.15, top=1.0)
 
             ax.plot(reverse_time, rsi_df1.tolist(), "-", color="#2bc2d6")
 
