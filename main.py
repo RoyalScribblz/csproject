@@ -351,7 +351,7 @@ class CoinPage(tk.Frame):  # second page
 
         app.bind("<Escape>", clear_page)  # return to main menu with escape key
 
-        tk.Label(self, text=coin + " / USDT", font=font_48, fg=SECONDARY_COLOUR, bg=BACKGROUND_COLOUR) \
+        tk.Label(self, text=coin + " / USDT", font=font_48, fg=TEXT_COLOUR, bg=SECONDARY_COLOUR) \
             .pack(pady=rel_height(0.01))
 
         def draw_graph():
@@ -480,7 +480,7 @@ class CoinPage(tk.Frame):  # second page
                 .place(relx=0.73, rely=0.58)
 
             def run_ai(dataframe):  # execute ai separately so not demanding on hardware when unwanted
-                AIPage.load_page(app.frames[AIPage], dataframe)
+                AIPage.load_page(app.frames[AIPage], dataframe, coin)
                 self.update_idletasks()  # make page transition less choppy
                 app.show_frame(AIPage)
 
@@ -578,7 +578,7 @@ class AIPage(tk.Frame):  # machine learning page
         tk.Frame.__init__(self, parent)
         self.configure(bg=BACKGROUND_COLOUR)
 
-    def load_page(self, df):
+    def load_page(self, df, coin):
         def clear_page(event):  # wipe the page
             for child in self.winfo_children():
                 child.destroy()  # destroy all widgets
@@ -632,6 +632,10 @@ class AIPage(tk.Frame):  # machine learning page
             ax.plot(lstm_time, lstm_res, "-w")  # add the machine learnt data on top
 
             FigureCanvasTkAgg(figure, self).get_tk_widget().place(x=0, y=0)
+
+            tk.Label(self, text=coin + " / USDT", font=font_48, fg=TEXT_COLOUR, bg=SECONDARY_COLOUR) \
+                .pack(pady=rel_height(0.01))
+
             load_finished = True
 
         threading.Thread(target=draw_graph).start()  # start in a new thread
