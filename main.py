@@ -14,6 +14,9 @@ import hashlib
 import sqlite3
 import uuid
 from tkinter import messagebox
+import mplfinance as mpf
+from utilities.styling import get_style
+import pandas as pd
 
 # platform (either linux or win32) for platform specific functions
 platform = sys.platform
@@ -355,38 +358,18 @@ class CoinPage(tk.Frame):  # second page
             .pack(pady=rel_height(0.01))
 
         def draw_graph():
-            df = get_klines(coin + "USDT", 1, "m", 1440)  # retrieve the past 24 hrs in 1 minute intervals
-            reverse_time = [i * -1 for i in range(0, 1440)][::-1]
+            df = get_klines(coin + "USDT", 5, "m", 288)  # retrieve the past 24 hrs in 1 minute intervals
+            reverse_time = [i * -1 for i in range(0, 1440, 5)][::-1]
 
-            # volume graph first (for overlap)
-            figure = plt.Figure(figsize=(0.7 * res_width / 100, 0.2 * res_height / 100), facecolor=BACKGROUND_COLOUR)
-
-            ax = figure.add_subplot(111, fc=BACKGROUND_COLOUR)
-            ax.set_ylabel("Volume ($)", fontsize=round(res_height / 80))
-            ax.xaxis.label.set_color(TEXT_COLOUR)
-            ax.yaxis.label.set_color(TEXT_COLOUR)
-            for axis in ["left"]:  # modify borders
-                ax.spines[axis].set_color(LINE_COLOUR)
-                ax.spines[axis].set_linewidth(3)
-            for axis in ["top", "right", "bottom"]:  # remove borders
-                ax.spines[axis].set_linewidth(0)
-            for axis in ["x", "y"]:
-                ax.tick_params(axis=axis, colors=LINE_COLOUR, which="both", width=2)
-            figure.tight_layout()
-            figure.subplots_adjust(left=0.05, right=1.0, bottom=0.0, top=1.0)
-
-            ax.plot(reverse_time, df["Volume"].astype(float), "-w")
-            FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.02, rely=0.06)
-
-            # same methods as main menu graph production
-            figure = plt.Figure(figsize=(0.7 * res_width / 100, 0.45 * res_height / 100), facecolor=BACKGROUND_COLOUR)
+            # main price chart same methods as main menu graph production
             start_price = float(df["Close"][0])
-            end_price = float(df["Close"][1439])
+            end_price = float(df["Close"][287])
             if end_price > start_price:
                 colour = "g"
             else:
                 colour = "r"
 
+            """figure = plt.Figure(figsize=(0.7 * res_width / 100, 0.45 * res_height / 100), facecolor=BACKGROUND_COLOUR)
             ax = figure.add_subplot(111, fc=BACKGROUND_COLOUR)
             ax.set_ylabel("Price ($)", fontsize=round(res_height / 80))
             ax.xaxis.label.set_color(TEXT_COLOUR)
@@ -405,9 +388,42 @@ class CoinPage(tk.Frame):  # second page
 
             # moving average
             moving_avg = indicators.moving_avg(df)
-            ax.plot(reverse_time, moving_avg, "-", color=(1.0, 1.0, 1.0, 0.3))  # plot ma
+            ax.plot(reverse_time, moving_avg, "-", color=(1.0, 1.0, 1.0, 0.3))  # plot ma"""
 
-            FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.02, rely=0.27)
+            df.index = pd.DatetimeIndex(df["Close time"])
+            df["Close"] = df["Close"].astype("float")
+            df["Open"] = df["Open"].astype("float")
+            df["High"] = df["High"].astype("float")
+            df["Low"] = df["Low"].astype("float")
+            df["Volume"] = df["Volume"].astype("float")
+
+            figure, ax = mpf.plot(df, type="candle", returnfig=True, tight_layout=True,
+                                  style=get_style(BACKGROUND_COLOUR, LINE_COLOUR, TEXT_COLOUR),
+                                  figsize=(0.737 * res_width / 100, 0.547 * res_height / 100))
+            FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=-0.025, rely=0.243)
+
+            # reset rc-params so normal matplotlib charts have normal styling
+            plt.style.use("default")
+
+            # volume graph second (for overlap)
+            figure = plt.Figure(figsize=(0.7 * res_width / 100, 0.2 * res_height / 100), facecolor=BACKGROUND_COLOUR)
+
+            ax = figure.add_subplot(111, fc=BACKGROUND_COLOUR)
+            ax.set_ylabel("Volume ($)", fontsize=round(res_height / 80))
+            ax.xaxis.label.set_color(TEXT_COLOUR)
+            ax.yaxis.label.set_color(TEXT_COLOUR)
+            for axis in ["left"]:  # modify borders
+                ax.spines[axis].set_color(LINE_COLOUR)
+                ax.spines[axis].set_linewidth(3)
+            for axis in ["top", "right", "bottom"]:  # remove borders
+                ax.spines[axis].set_linewidth(0)
+            for axis in ["x", "y"]:
+                ax.tick_params(axis=axis, colors=LINE_COLOUR, which="both", width=2)
+            figure.tight_layout()
+            figure.subplots_adjust(left=0.05, right=1.0, bottom=0.0, top=1.0)
+
+            ax.plot(reverse_time, df["Volume"].astype(float), "-w")
+            FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.02, rely=0.06)
 
             # relative strength index 1
             rsi_df1 = indicators.rsi(df, 14)
