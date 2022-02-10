@@ -391,11 +391,8 @@ class CoinPage(tk.Frame):  # second page
             ax.plot(reverse_time, moving_avg, "-", color=(1.0, 1.0, 1.0, 0.3))  # plot ma"""
 
             df.index = pd.DatetimeIndex(df["Close time"])
-            df["Close"] = df["Close"].astype("float")
-            df["Open"] = df["Open"].astype("float")
-            df["High"] = df["High"].astype("float")
-            df["Low"] = df["Low"].astype("float")
-            df["Volume"] = df["Volume"].astype("float")
+            for column in ("Close", "Open", "High", "Low", "Volume"):
+                df[column] = df[column].astype("float")
 
             figure, ax = mpf.plot(df, type="candle", returnfig=True, tight_layout=True, ylabel="Price ($)",
                                   style=get_style(BACKGROUND_COLOUR, LINE_COLOUR, TEXT_COLOUR),
