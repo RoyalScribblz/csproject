@@ -12,7 +12,8 @@ def get_style(background_colour, line_colour, text_colour):
                   "ytick.labelcolor": text_colour,
                   "axes.spines.top": False,
                   "axes.spines.right": False,
-                  "axes.labelcolor": text_colour}
+                  "axes.labelcolor": text_colour,
+                  "axes.labelsize": 18}
 
     style = mpf.make_mpf_style(marketcolors=market_colours,
                                facecolor=background_colour,

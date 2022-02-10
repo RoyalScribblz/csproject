@@ -397,7 +397,7 @@ class CoinPage(tk.Frame):  # second page
             df["Low"] = df["Low"].astype("float")
             df["Volume"] = df["Volume"].astype("float")
 
-            figure, ax = mpf.plot(df, type="candle", returnfig=True, tight_layout=True,
+            figure, ax = mpf.plot(df, type="candle", returnfig=True, tight_layout=True, ylabel="Price ($)",
                                   style=get_style(BACKGROUND_COLOUR, LINE_COLOUR, TEXT_COLOUR),
                                   figsize=(0.737 * res_width / 100, 0.547 * res_height / 100))
             FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=-0.025, rely=0.243)
