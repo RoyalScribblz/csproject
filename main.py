@@ -364,31 +364,6 @@ class CoinPage(tk.Frame):  # second page
             # main price chart same methods as main menu graph production
             start_price = float(df["Close"][0])
             end_price = float(df["Close"][287])
-            if end_price > start_price:
-                colour = "g"
-            else:
-                colour = "r"
-
-            """figure = plt.Figure(figsize=(0.7 * res_width / 100, 0.45 * res_height / 100), facecolor=BACKGROUND_COLOUR)
-            ax = figure.add_subplot(111, fc=BACKGROUND_COLOUR)
-            ax.set_ylabel("Price ($)", fontsize=round(res_height / 80))
-            ax.xaxis.label.set_color(TEXT_COLOUR)
-            ax.yaxis.label.set_color(TEXT_COLOUR)
-            for axis in ["left"]:  # modify borders
-                ax.spines[axis].set_color(LINE_COLOUR)
-                ax.spines[axis].set_linewidth(3)
-            for axis in ["top", "right", "bottom"]:  # remove borders
-                ax.spines[axis].set_linewidth(0)
-            for axis in ["x", "y"]:
-                ax.tick_params(axis=axis, colors=LINE_COLOUR, which="both", width=2)
-            figure.tight_layout()
-            figure.subplots_adjust(left=0.06, right=1.0, bottom=0.0, top=1.0)
-
-            ax.plot(reverse_time, df["Close"].astype(float), "-" + colour)  # plot main line
-
-            # moving average
-            moving_avg = indicators.moving_avg(df)
-            ax.plot(reverse_time, moving_avg, "-", color=(1.0, 1.0, 1.0, 0.3))  # plot ma"""
 
             df.index = pd.DatetimeIndex(df["Close time"])
             for column in ("Close", "Open", "High", "Low", "Volume"):
@@ -618,7 +593,7 @@ class AIPage(tk.Frame):  # machine learning page
             figure.tight_layout()
             figure.subplots_adjust(left=0.06, right=0.98, bottom=0.06, top=0.98)
 
-            ax.plot([i * -1 / 60 for i in range(0, 288)][::-1], df["Close"].astype(float), "-", color=ACCENT_COLOUR)
+            ax.plot([i * -1 for i in range(0, 1440, 5)][::-1], df["Close"].astype(float), "-", color=ACCENT_COLOUR)
 
             # loading text covered by graph
             loading_text = tk.Label(self, text="Processing, please wait", font=font_20, bg=BACKGROUND_COLOUR,
@@ -641,7 +616,7 @@ class AIPage(tk.Frame):  # machine learning page
 
             # lstm
             lstm_res = lstm(df["Close"].astype(float).tolist(), 100)
-            lstm_time = [i / 60 for i in range(1, 101)]
+            lstm_time = range(1, 101)
             ax.plot(lstm_time, lstm_res, "-w")  # add the machine learnt data on top
 
             FigureCanvasTkAgg(figure, self).get_tk_widget().place(x=0, y=0)
