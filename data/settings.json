@@ -88,6 +88,17 @@
         ]
     },
     {
+        "uuid": "1ec25752-4b91-11ec-bc49-294130bd189f",
+        "favourites": [
+            "BTC",
+            "BNT",
+            "ADA",
+            "ETH",
+            "BNB",
+            "RLC"
+        ]
+    },
+    {
         "uuid": "cf6e97dd-7207-11ec-9d5d-001a7dda7111",
         "favourites": [
             "BTC",
@@ -107,6 +118,17 @@
             "FIDA",
             "LINK",
             "XRP"
+        ]
+    },
+    {
+        "uuid": "a3fbc42e-8b3a-11ec-9b48-e3c6d42cb736",
+        "favourites": [
+            "BTC",
+            "ETH",
+            "XRP",
+            "LTC",
+            "LINK",
+            "ADA"
         ]
     }
 ]

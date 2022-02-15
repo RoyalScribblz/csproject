@@ -382,7 +382,7 @@ class CoinPage(tk.Frame):  # second page
             for axis in ["x", "y"]:
                 ax.tick_params(axis=axis, colors=LINE_COLOUR, which="both", width=2)
             figure.tight_layout()
-            figure.subplots_adjust(left=0.05, right=1.0, bottom=0.0, top=1.0)
+            figure.subplots_adjust(left=0.06, right=1.0, bottom=0.0, top=1.0)
 
             ax.plot(reverse_time, df["Close"].astype(float), "-" + colour)  # plot main line
 
@@ -417,7 +417,7 @@ class CoinPage(tk.Frame):  # second page
             for axis in ["x", "y"]:
                 ax.tick_params(axis=axis, colors=LINE_COLOUR, which="both", width=2)
             figure.tight_layout()
-            figure.subplots_adjust(left=0.05, right=1.0, bottom=0.0, top=1.0)
+            figure.subplots_adjust(left=0.06, right=1.0, bottom=0.0, top=1.0)
 
             ax.plot(reverse_time, df["Volume"].astype(float), "-w")
             FigureCanvasTkAgg(figure, self).get_tk_widget().place(relx=0.02, rely=0.06)
@@ -440,7 +440,7 @@ class CoinPage(tk.Frame):  # second page
             for axis in ["x", "y"]:
                 ax.tick_params(axis=axis, colors=LINE_COLOUR, which="both", width=2)
             figure.tight_layout()
-            figure.subplots_adjust(left=0.05, right=1.0, bottom=0.15, top=1.0)
+            figure.subplots_adjust(left=0.06, right=1.0, bottom=0.15, top=1.0)
 
             ax.plot(reverse_time, rsi_df1.tolist(), "-", color="#2bc2d6")
 
@@ -458,39 +458,39 @@ class CoinPage(tk.Frame):  # second page
 
             # current price
             tk.Label(self, text="Price Now: $" + "{:,.2f}".format(end_price), font=font_34,
-                     bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR).place(relx=0.73, rely=0.1)
+                     bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR).place(relx=0.72, rely=0.1)
 
             # 24 hour high
             day_high = round(float(df["Close"].max()), 2)
             tk.Label(self, text="24hr High: $" + "{:,.2f}".format(day_high), font=font_34,
-                     bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR).place(relx=0.73, rely=0.18)
+                     bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR).place(relx=0.72, rely=0.18)
 
             # 24 hour low
             day_low = round(float(df["Close"].min()), 2)
             tk.Label(self, text="24hr Low: $" + "{:,.2f}".format(day_low), font=font_34,
-                     bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR).place(relx=0.73, rely=0.26)
+                     bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR).place(relx=0.72, rely=0.26)
 
             # 24 hour percentage change
             per_change = round(((end_price - start_price) / start_price) * 100, 2)
             per_change = "+" + str(per_change) if per_change > 0 else "" + str(per_change)
             tk.Label(self, text="24hr Change: " + per_change + "%", font=font_34, bg=BACKGROUND_COLOUR,
                      fg=ACCENT_COLOUR) \
-                .place(relx=0.73, rely=0.34)
+                .place(relx=0.72, rely=0.34)
 
             # relative strength index 1
             current_rsi1 = round(rsi_df1.iloc[-1], 4)
             tk.Label(self, text="14m RSI: " + str(current_rsi1), font=font_34, bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR) \
-                .place(relx=0.73, rely=0.42)
+                .place(relx=0.72, rely=0.42)
 
             # relative strength index 2
             current_rsi2 = round(rsi_df2.iloc[-1], 4)
             tk.Label(self, text="28m RSI: " + str(current_rsi2), font=font_34, bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR) \
-                .place(relx=0.73, rely=0.50)
+                .place(relx=0.72, rely=0.50)
 
             # relative strength index 3
             current_rsi3 = round(rsi_df3.iloc[-1], 4)
             tk.Label(self, text="56m RSI: " + str(current_rsi3), font=font_34, bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR) \
-                .place(relx=0.73, rely=0.58)
+                .place(relx=0.72, rely=0.58)
 
             def run_ai(dataframe):  # execute ai separately so not demanding on hardware when unwanted
                 AIPage.load_page(app.frames[AIPage], dataframe, coin)
@@ -518,17 +518,17 @@ class CoinPage(tk.Frame):  # second page
             # market cap
             market_cap = cg_data["market_data"]["market_cap"]["usd"]
             tk.Label(self, text="Market Cap: $" + utils.number_suffix(market_cap), font=font_34,
-                     bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR).place(relx=0.73, rely=0.66)
+                     bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR).place(relx=0.72, rely=0.66)
 
             # 24hr trade volume
             volume = cg_data["market_data"]["total_volume"]["usd"]
             tk.Label(self, text="Trade Volume: $" + utils.number_suffix(volume), font=font_34, bg=BACKGROUND_COLOUR,
-                     fg=ACCENT_COLOUR).place(relx=0.73, rely=0.74)
+                     fg=ACCENT_COLOUR).place(relx=0.72, rely=0.74)
 
             # all time high
             ath = cg_data["market_data"]["ath"]["usd"]
             tk.Label(self, text="All-Time Hi: $" + "{:,.2f}".format(ath), font=font_34, bg=BACKGROUND_COLOUR,
-                     fg=ACCENT_COLOUR).place(relx=0.73, rely=0.82)
+                     fg=ACCENT_COLOUR).place(relx=0.72, rely=0.82)
 
         threading.Thread(target=coin_gecko_stats).start()  # start on new thread
 
@@ -616,9 +616,9 @@ class AIPage(tk.Frame):  # machine learning page
             for axis in ["x", "y"]:
                 ax.tick_params(axis=axis, colors=LINE_COLOUR, which="both", width=2)
             figure.tight_layout()
-            figure.subplots_adjust(left=0.04, right=0.98, bottom=0.05, top=0.98)
+            figure.subplots_adjust(left=0.06, right=0.98, bottom=0.06, top=0.98)
 
-            ax.plot([i * -1 / 60 for i in range(0, 1440)][::-1], df["Close"].astype(float), "-", color=ACCENT_COLOUR)
+            ax.plot([i * -1 / 60 for i in range(0, 288)][::-1], df["Close"].astype(float), "-", color=ACCENT_COLOUR)
 
             # loading text covered by graph
             loading_text = tk.Label(self, text="Processing, please wait", font=font_20, bg=BACKGROUND_COLOUR,
