@@ -361,6 +361,11 @@ class CoinPage(tk.Frame):  # second page
             df = get_klines(coin + "USDT", 5, "m", 288)  # retrieve the past 24 hrs in 1 minute intervals
             reverse_time = [i * -1 for i in range(0, 1440, 5)][::-1]
 
+            if df is None:
+                tk.Label(self, text="Token not found, press ESC to return!", font=font_28,
+                         bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR).place(anchor="center", relx=0.5, rely=0.5)
+                return
+
             # main price chart same methods as main menu graph production
             start_price = float(df["Close"][0])
             end_price = float(df["Close"][287])
