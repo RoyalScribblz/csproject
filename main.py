@@ -245,6 +245,15 @@ class MainMenu(tk.Frame):  # main menu
 
             for index in range(6):
                 df = get_klines(fav_coins[index][0] + "USDT", 1, "h", 24)  # retrieve the candlestick data
+
+                # invalid search
+                if df is None:
+                    tk.Label(self, text="Token not found, please replace.", font=font_48,
+                             bg=BACKGROUND_COLOUR, fg=TEXT_COLOUR).place(relx=graphs_x[index] + 0.02,
+                                                                         rely=graphs_y[index] + 0.1)
+                    fav_coins[index].append('-1000')  # -1000% is not possible therefore can use as identifier
+                    continue
+
                 figure = plt.Figure(figsize=(0.3 * res_width / 100, 0.26 * res_height / 100),
                                     facecolor=BACKGROUND_COLOUR)
                 start_price = float(df["Close"][0])
@@ -284,6 +293,11 @@ class MainMenu(tk.Frame):  # main menu
             fav_coins.sort(key=lambda x: float(x[1]), reverse=True)  # sort by percentage change
             y = 0.38
             for change in fav_coins:
+                if change[1] == "-1000":
+                    tk.Label(self, text=f"Invalid Token", font=font_25, bg=BACKGROUND_COLOUR,
+                             fg=TEXT_COLOUR).place(relx=0.71, rely=y)
+                    y += 0.09
+                    continue
                 if float(change[1]) > 0:
                     symbol = "+"  # add symbol if positive
                 else:
@@ -361,6 +375,7 @@ class CoinPage(tk.Frame):  # second page
             df = get_klines(coin + "USDT", 5, "m", 288)  # retrieve the past 24 hrs in 1 minute intervals
             reverse_time = [i * -1 for i in range(0, 1440, 5)][::-1]
 
+            # invalid search
             if df is None:
                 tk.Label(self, text="Token not found, press ESC to return!", font=font_28,
                          bg=BACKGROUND_COLOUR, fg=ACCENT_COLOUR).place(anchor="center", relx=0.5, rely=0.5)
